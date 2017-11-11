@@ -70,7 +70,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  */
 
 @Autonomous(name="VuMark", group ="Autonomous")
-//@Disabled
+@Disabled
 public class TOBORVuMarkIdentification extends OpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";
