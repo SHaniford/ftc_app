@@ -43,28 +43,11 @@ import com.qualcomm.robotcore.util.Range;
 
 public class TOBORTank extends OpMode {
 
-    DcMotor FRMotor;
-    DcMotor FLMotor;
-    DcMotor BRMotor;
-    DcMotor BLMotor;
-    DcMotor rightTrack;
-    DcMotor leftTrack;
-    Servo RPlate;
-    Servo LPlate;
+    HardwareTOBOR robo = new HardwareTOBOR();
 
     @Override
     public void init() {
-        FRMotor = hardwareMap.dcMotor.get("FRight");
-        FLMotor = hardwareMap.dcMotor.get("FLeft");
-        BRMotor = hardwareMap.dcMotor.get("BRight");
-        BLMotor = hardwareMap.dcMotor.get("BLeft");
-        //rightTrack = hardwareMap.dcMotor.get("rTrack");
-        //leftTrack = hardwareMap.dcMotor.get("lTrack");
-
-
-        FRMotor.setDirection(DcMotor.Direction.REVERSE);
-        BRMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightTrack.setDirection(DcMotor.Direction.REVERSE);
+        robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
     }
 
@@ -76,58 +59,52 @@ public class TOBORTank extends OpMode {
     public void loop() {
         if (gamepad1.right_trigger>=0.1)
         {
-            BLMotor.setPower(-1*gamepad1.left_trigger);
-            BRMotor.setPower(-1*gamepad1.left_trigger);
-            FRMotor.setPower(1*gamepad1.left_trigger);
-            FLMotor.setPower(1*gamepad1.left_trigger);
+            robo.strafeRight(gamepad1.right_trigger);
         }
         else if (gamepad1.left_trigger>=0.1)
         {
-            BLMotor.setPower(1*gamepad1.left_trigger);
-            BRMotor.setPower(1*gamepad1.left_trigger);
-            FRMotor.setPower(-1*gamepad1.left_trigger);
-            FLMotor.setPower(-1*gamepad1.left_trigger);
+            robo.strafeLeft(gamepad1.left_trigger);
         }
         else
         {
-            FRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
-            BRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
-            FLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
-            BLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
+            robo.FRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
+            robo.BRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
+            robo.FLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
+            robo.BLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
         }
 
         // send the info back to driver station using telemetry function.
         if (gamepad1.left_bumper)
         {
-            rightTrack.setPower(-1);
-            leftTrack.setPower(-1);
+            robo.rightTrack.setPower(-1);
+            robo.leftTrack.setPower(-1);
         }
         if (gamepad1.right_bumper)
         {
-            rightTrack.setPower(1);
-            leftTrack.setPower(1);
+            robo.rightTrack.setPower(1);
+            robo.leftTrack.setPower(1);
         }
 
         if (gamepad1.a)
         {
-            RPlate.setPosition(RPlate.getPosition()+0.002);
-            LPlate.setPosition(LPlate.getPosition()-0.002);
+            robo.RPlate.setPosition(robo.RPlate.getPosition()+0.002);
+            robo.LPlate.setPosition(robo.LPlate.getPosition()-0.002);
         }
         if (gamepad1.b)
         {
-            RPlate.setPosition(RPlate.getPosition()-0.002);
-            LPlate.setPosition(LPlate.getPosition()+0.002);
+            robo.RPlate.setPosition(robo.RPlate.getPosition()-0.002);
+            robo.LPlate.setPosition(robo.LPlate.getPosition()+0.002);
         }
     }
 
 
     @Override
     public void stop() {
-        FRMotor.setPower(0);
-        BRMotor.setPower(0);
-        FLMotor.setPower(0);
-        BLMotor.setPower(0);
-        rightTrack.setPower(0);
-        leftTrack.setPower(0);
+        robo.FRMotor.setPower(0);
+        robo.BRMotor.setPower(0);
+        robo.FLMotor.setPower(0);
+        robo.BLMotor.setPower(0);
+        robo.rightTrack.setPower(0);
+        robo.leftTrack.setPower(0);
     }
 }
