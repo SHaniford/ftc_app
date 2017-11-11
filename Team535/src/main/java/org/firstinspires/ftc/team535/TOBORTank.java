@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "TOBOR Tank Drive", group = "Teleop")
-@Disabled
+//@Disabled
 
 public class TOBORTank extends OpMode {
 
