@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -40,11 +41,12 @@ import com.qualcomm.robotcore.hardware.I2cAddr;
 /**
  * Demonstrates how to setup and use 2 MR color sensors
  */
-@Autonomous(name = "Read MR Color Sensor", group = "Example")
-@Disabled
+@Autonomous(name = "Read MR Color Sensor with HSV", group = "Example")
+//@Disabled
 public class Example1ColorSensor extends OpMode {
 
     ColorSensor colorSensor;
+    float hsvValues[] = {0F,0F,0F};
 
     @Override
     public void init() {
@@ -70,11 +72,16 @@ public class Example1ColorSensor extends OpMode {
     public void loop() {
         if(gamepad1.a) {colorSensor.enableLed(false);} else {colorSensor.enableLed(true);}
 
+        Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
+
         telemetry.addData("0", "Press A on Gamepad1 to turn off LED");
         telemetry.addData("1", "Red: " + colorSensor.red());
         telemetry.addData("2", "Green: " + colorSensor.green());
         telemetry.addData("3", "Blue: " + colorSensor.blue());
         telemetry.addData("4", "Alpha: " + colorSensor.alpha());
+        telemetry.addData("5", "Hue: " + hsvValues[0]);
+        telemetry.addData("6", "Sat: " + hsvValues[1]);
+        telemetry.addData("7", "Val: " + hsvValues[2]);
     }
 
     @Override
