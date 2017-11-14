@@ -55,49 +55,83 @@ import com.qualcomm.robotcore.util.Range;
 public class ToborRedSideAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
+    TOBORVuMarkIdentification.Crypto CryptoColumn;
+    public enum state{
+        DRIVEOFFSTONE,
 
+    }
+    state currentState = state.DRIVEOFFSTONE;
     @Override
-    public void init() {
+    public void init()
+    {
         telemetry.addData("Status", "Initialized");
         robo.initRobo(hardwareMap);
         robo.initVuforia();
+        robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
 
     @Override
-    public void init_loop() {
+    public void init_loop()
+    {
         robo.seekImage();
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");
+            CryptoColumn = TOBORVuMarkIdentification.Crypto.Left;
         }
         else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
         {
             telemetry.addData("Vumark Center","Acquired");
+            CryptoColumn = TOBORVuMarkIdentification.Crypto.Center;
         }
         else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Right)
         {
             telemetry.addData("Vumark Right","Acquired");
+            CryptoColumn = TOBORVuMarkIdentification.Crypto.Right;
         }
         else
         {
             telemetry.addData("Vumark", "Unknown");
         }
+        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 
 
     @Override
-    public void start(){
+    public void start()
+    {
 
     }
 
     @Override
-    public void loop() {
+    public void loop()
+    {
+        robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (currentState == state.DRIVEOFFSTONE)
+        {
+            robo.BRMotor.setTargetPosition(-1000);
+            robo.BLMotor.setTargetPosition(-1000);
+            robo.FRMotor.setTargetPosition(1000);
+            robo.FLMotor.setTargetPosition(1000);
+            robo.strafeLeft(1);
+        }
     }
 
     @Override
-    public void stop() {
+    public void stop()
+    {
+
     }
 
 }
