@@ -54,17 +54,35 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class ToborRedSideAutonomous extends OpMode
 {
+    HardwareTOBOR robo = new HardwareTOBOR();
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
-
-
+        robo.initRobo(hardwareMap);
+        robo.initVuforia();
     }
 
 
     @Override
     public void init_loop() {
+        robo.seekImage();
+        if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
+        {
+            telemetry.addData("Vumark Left","Acquired");
+        }
+        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
+        {
+            telemetry.addData("Vumark Center","Acquired");
+        }
+        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Right)
+        {
+            telemetry.addData("Vumark Right","Acquired");
+        }
+        else
+        {
+            telemetry.addData("Vumark", "Unknown");
+        }
     }
 
 
