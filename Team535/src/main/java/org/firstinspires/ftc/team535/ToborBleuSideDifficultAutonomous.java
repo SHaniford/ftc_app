@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
 //@Disabled
-public class ToborBleuSideAutonomous extends OpMode
+public class ToborBleuSideDifficultAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
 public enum Autonomous{}
