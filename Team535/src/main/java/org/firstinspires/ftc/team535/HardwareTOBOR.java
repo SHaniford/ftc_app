@@ -101,6 +101,8 @@ public class HardwareTOBOR
         BLMotor = hwMap.dcMotor.get("BLeft");
         rightTrack = hwMap.dcMotor.get("RTrack");
         leftTrack = hwMap.dcMotor.get("LTrack");
+        RPlate = hwMap.servo.get("RPlate");
+        LPlate = hwMap.servo.get("LPlate");
 
 
         FRMotor.setDirection(DcMotor.Direction.REVERSE);
