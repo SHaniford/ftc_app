@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
 //@Disabled
-public class ToborBleuSideAutonomous extends OpMode
+public class ToborBleuSideLSAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
 public enum Autonomous{}
@@ -57,13 +57,14 @@ public enum Autonomous{}
     public void init() {
         telemetry.addData("Status", "Initialized");
     robo.initRobo(hardwareMap);
-
+        robo.initVuforia();
 
     }
 
 
     @Override
     public void init_loop() {
+        robo.seekImage();
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");

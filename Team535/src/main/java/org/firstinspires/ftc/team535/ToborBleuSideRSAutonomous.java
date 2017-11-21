@@ -31,6 +31,9 @@ package org.firstinspires.ftc.team535;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.vuforia.VuMarkTarget;
+
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -48,22 +51,26 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
 //@Disabled
-public class ToborBleuSideDifficultAutonomous extends OpMode
+public class ToborBleuSideRSAutonomous extends OpMode
 {
+    public RelicRecoveryVuMark roboLocation;
+    
+
     HardwareTOBOR robo = new HardwareTOBOR();
-public enum Autonomous{}
+public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spitout, end }
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
     robo.initRobo(hardwareMap);
-
+        robo.initVuforia();
 
     }
 
 
     @Override
     public void init_loop() {
+        robo.seekImage();
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");
