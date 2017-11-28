@@ -46,7 +46,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
+@TeleOp(name="TOBORBleuSideLSAutonomous", group="Autonomous")
 //@Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {
