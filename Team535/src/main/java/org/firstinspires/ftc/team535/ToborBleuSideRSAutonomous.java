@@ -49,7 +49,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
+@TeleOp(name="TOBORBleuSideRSAutonomous", group="Autonomous")
 //@Disabled
 public class ToborBleuSideRSAutonomous extends OpMode
 {

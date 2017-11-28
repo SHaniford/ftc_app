@@ -58,40 +58,38 @@ public class TOBORTank extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.right_trigger>=0.1)
-        {
+        if (gamepad1.right_trigger >= 0.1) {
             robo.strafeRight(gamepad1.right_trigger);
-        }
-        else if (gamepad1.left_trigger>=0.1)
-        {
+        } else if (gamepad1.left_trigger >= 0.1) {
             robo.strafeLeft(gamepad1.left_trigger);
-        }
-        else
-        {
-            robo.FRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
-            robo.BRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
-            robo.FLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
-            robo.BLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
+        } else {
+            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y, -1, 1));
+            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y, -1, 1));
+            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y, -1, 1));
+            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y, -1, 1));
         }
 
         // send the info back to driver station using telemetry function.
-        if (gamepad1.left_bumper)
-        {
+        if (gamepad1.left_bumper) {
             robo.rightTrack.setPower(-1);
             robo.leftTrack.setPower(-1);
         }
-        if (gamepad1.right_bumper)
-        {
+        if (gamepad1.right_bumper) {
             robo.rightTrack.setPower(1);
             robo.leftTrack.setPower(1);
+        } else if (gamepad1.x)
+        {
+            robo.rightTrack.setPower(0);
+            robo.leftTrack.setPower(0);
         }
-
+        telemetry.addData("LPlate", robo.LPlate.getPosition());
+        telemetry.addData("RPlate", robo.RPlate.getPosition());
         if (gamepad1.a)
         {
             robo.RPlate.setPosition(robo.RPlate.getPosition()+0.002);
             robo.LPlate.setPosition(robo.LPlate.getPosition()-0.002);
         }
-        if (gamepad1.b)
+        else if (gamepad1.b)
         {
             robo.RPlate.setPosition(robo.RPlate.getPosition()-0.002);
             robo.LPlate.setPosition(robo.LPlate.getPosition()+0.002);

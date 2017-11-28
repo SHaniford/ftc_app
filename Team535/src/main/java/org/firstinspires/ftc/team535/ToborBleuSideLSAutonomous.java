@@ -49,7 +49,7 @@ import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readI
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
+@TeleOp(name="TOBORBleuSideLSAutonomous", group="Autonomous")
 //@Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {
