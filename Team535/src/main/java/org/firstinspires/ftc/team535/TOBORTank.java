@@ -96,6 +96,8 @@ public class TOBORTank extends OpMode {
             robo.RPlate.setPosition(robo.RPlate.getPosition()-0.002);
             robo.LPlate.setPosition(robo.LPlate.getPosition()+0.002);
         }
+        telemetry.addData("RPlate", robo.RPlate.getPosition());
+        telemetry.addData("LPlate", robo.LPlate.getPosition());
     }
 
 
