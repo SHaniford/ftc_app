@@ -29,8 +29,11 @@
 
 package org.firstinspires.ftc.team535;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readImage;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -51,14 +54,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class ToborBleuSideLSAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
-public enum Autonomous{}
+public enum Auto{readImage, left, center, right, dispense, end }
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
     robo.initRobo(hardwareMap);
         robo.initVuforia();
-
+        Auto blueSide;
+        blueSide = readImage;
     }
 
 
@@ -83,15 +87,9 @@ public enum Autonomous{}
         }
     }
 
-
-
-    @Override
-    public void start(){
-
-    }
-
     @Override
     public void loop() {
+
     }
 
     @Override
