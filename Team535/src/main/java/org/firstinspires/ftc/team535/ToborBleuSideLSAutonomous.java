@@ -33,7 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.center;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.left;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readImage;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.right;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -55,14 +58,15 @@ public class ToborBleuSideLSAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
 public enum Auto{readImage, left, center, right, dispense, end }
-
+    public int location;
+    Auto blueSide;
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
     robo.initRobo(hardwareMap);
         robo.initVuforia();
-        Auto blueSide;
         blueSide = readImage;
+        location = 0;
     }
 
 
@@ -72,26 +76,53 @@ public enum Auto{readImage, left, center, right, dispense, end }
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");
+            location = 1;
         }
         else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
         {
             telemetry.addData("Vumark Center","Acquired");
+            location = 2;
         }
         else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Right)
         {
             telemetry.addData("Vumark Right","Acquired");
+            location = 3;
         }
         else
         {
             telemetry.addData("Vumark", "Unknown");
+            location = 0;
         }
     }
 
     @Override
     public void loop() {
+        switch (blueSide) {
+            case readImage:
+                if (location != 0) {
+                    if (location == 1) {
+                        blueSide = left;
+                    }
 
+                    if (location == 2) {
+                        blueSide = center;
+                    }
+                    if (location == 3) {
+                        blueSide = right;
+                    }
+                }
+                break;
+            case left:
+
+                break;
+            case center:
+
+                break;
+            case right:
+
+                break;
+                }
     }
-
     @Override
     public void stop() {
     }
