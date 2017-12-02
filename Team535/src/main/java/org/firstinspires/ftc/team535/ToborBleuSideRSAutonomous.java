@@ -55,7 +55,8 @@ public class ToborBleuSideRSAutonomous extends OpMode
 {
     public RelicRecoveryVuMark roboLocation;
     
-
+//Hey Steven, Log off <3
+    //Swag 420 Blaze it
     HardwareTOBOR robo = new HardwareTOBOR();
 public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spitout, end }
 

@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import java.lang.Math;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -58,12 +59,19 @@ public class ToborRedSideAutonomous extends OpMode
     TOBORVuMarkIdentification.Crypto CryptoColumn;
     public enum state{
         DRIVEOFFSTONE,
+        SEEKCOLUMN,
+        MOVEFORWARD,
+        PLACEBLOCK,
+        BACKUP
 
     }
+    //double TPI = 1120/(4*Math.PI);
+    int TPI = 1493;
     state currentState = state.DRIVEOFFSTONE;
     @Override
     public void init()
     {
+
         telemetry.addData("Status", "Initialized");
         robo.initRobo(hardwareMap);
         robo.initVuforia();
@@ -120,12 +128,32 @@ public class ToborRedSideAutonomous extends OpMode
         robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         if (currentState == state.DRIVEOFFSTONE)
         {
-            robo.BRMotor.setTargetPosition(-1000);
-            robo.BLMotor.setTargetPosition(-1000);
-            robo.FRMotor.setTargetPosition(1000);
-            robo.FLMotor.setTargetPosition(1000);
+            robo.BRMotor.setTargetPosition(-24*TPI);
+            robo.BLMotor.setTargetPosition(24*TPI);
+            robo.FRMotor.setTargetPosition(24*TPI);
+            robo.FLMotor.setTargetPosition(-24*TPI);
             robo.strafeLeft(1);
         }
+        else if (currentState == state.SEEKCOLUMN)
+        {
+            if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Left)
+            {
+
+            }
+            else if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Right)
+            {
+
+            }
+            else if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Center)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
     }
 
     @Override
