@@ -74,6 +74,7 @@ public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spi
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");
+
         }
         else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
         {

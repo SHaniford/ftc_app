@@ -44,10 +44,11 @@ import com.qualcomm.robotcore.util.Range;
 public class TOBORTank extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
-
+    double speedControl = 1;
 
     @Override
     public void init() {
+
         robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
     }
@@ -58,18 +59,28 @@ public class TOBORTank extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.right_trigger >= 0.1) {
-            robo.strafeRight(gamepad1.right_trigger);
-        } else if (gamepad1.left_trigger >= 0.1) {
-            robo.strafeLeft(gamepad1.left_trigger);
-        } else {
-            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y, -1, 1));
-            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y, -1, 1));
-            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y, -1, 1));
-            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y, -1, 1));
+        if (gamepad1.dpad_down)
+        {
+            speedControl = 0.5;
         }
 
-        // send the info back to driver station using telemetry function.
+        if (gamepad1.dpad_up)
+        {
+            speedControl = 1;
+        }
+
+        if (gamepad1.right_trigger >= 0.1) {
+            robo.strafeRight(gamepad1.right_trigger*speedControl);
+        } else if (gamepad1.left_trigger >= 0.1) {
+            robo.strafeLeft(gamepad1.left_trigger*speedControl);
+        } else {
+            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
+            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
+            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
+            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
+        }
+
+
         if (gamepad1.left_bumper) {
             robo.rightTrack.setPower(-1);
             robo.leftTrack.setPower(-1);
