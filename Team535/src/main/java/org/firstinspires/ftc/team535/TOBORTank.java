@@ -45,12 +45,18 @@ public class TOBORTank extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
     double speedControl = 1;
+    boolean toggleR = false;
+    boolean runningR = false;
+    boolean toggleL = false;
+    boolean runningL = false;
+
 
     @Override
     public void init() {
 
         robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
+
     }
 
     @Override
@@ -80,19 +86,59 @@ public class TOBORTank extends OpMode {
             robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
         }
 
-
-        if (gamepad1.left_bumper) {
-            robo.rightTrack.setPower(-1);
-            robo.leftTrack.setPower(-1);
+        if (toggleR)
+        {
+            if (gamepad1.right_bumper)
+            {
+                runningR = !runningR;
+                toggleR = false;
+            }
         }
-        if (gamepad1.right_bumper) {
+        else if (!gamepad1.right_bumper)
+        {
+            toggleR = true;
+        }
+        
+        
+        if (runningR)
+        {
             robo.rightTrack.setPower(1);
             robo.leftTrack.setPower(1);
-        } else if (gamepad1.x)
+        }
+        else if (!runningR)
         {
             robo.rightTrack.setPower(0);
             robo.leftTrack.setPower(0);
         }
+
+
+
+        if (toggleL)
+        {
+            if (gamepad1.left_bumper)
+            {
+                runningL = !runningL;
+                toggleL = false;
+            }
+        }
+        else if (!gamepad1.left_bumper)
+        {
+            toggleL = true;
+        }
+
+
+        if (runningL)
+        {
+            robo.rightTrack.setPower(-1);
+            robo.leftTrack.setPower(-1);
+        }
+        else if (!runningL)
+        {
+            robo.rightTrack.setPower(0);
+            robo.leftTrack.setPower(0);
+        }
+
+
         telemetry.addData("LPlate", robo.LPlate.getPosition());
         telemetry.addData("RPlate", robo.RPlate.getPosition());
         if (gamepad1.a)

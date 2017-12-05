@@ -66,7 +66,7 @@ public class ToborRedSideAutonomous extends OpMode
 
     }
     //double TPI = 1120/(4*Math.PI);
-    int TPI = 1493;
+    int TPI = 93;
     state currentState = state.DRIVEOFFSTONE;
     @Override
     public void init()
@@ -126,7 +126,19 @@ public class ToborRedSideAutonomous extends OpMode
         robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (currentState == state.DRIVEOFFSTONE)
+        switch (currentState){
+            case DRIVEOFFSTONE:
+                robo.BRMotor.setTargetPosition(-24*TPI);
+                robo.BLMotor.setTargetPosition(24*TPI);
+                robo.FRMotor.setTargetPosition(24*TPI);
+                robo.FLMotor.setTargetPosition(-24*TPI);
+                robo.strafeLeftAuto(0.7);
+            break;
+        }
+
+
+
+        /*if (currentState == state.DRIVEOFFSTONE)
         {
             robo.BRMotor.setTargetPosition(-24*TPI);
             robo.BLMotor.setTargetPosition(24*TPI);
@@ -152,7 +164,7 @@ public class ToborRedSideAutonomous extends OpMode
             {
 
             }
-        }
+        }*/
 
     }
 
