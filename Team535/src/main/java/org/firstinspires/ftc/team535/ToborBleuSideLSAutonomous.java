@@ -32,12 +32,14 @@ package org.firstinspires.ftc.team535;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.center;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.left;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.offStone;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readImage;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.right;
-
+import java.lang.Math;
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -57,7 +59,7 @@ import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.right
 public class ToborBleuSideLSAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
-public enum Auto{readImage, left, center, right, dispense, end }
+public enum Auto{readImage, offStone, left, center, right, dispense, end }
     public int location;
     Auto blueSide;
     @Override
@@ -97,19 +99,22 @@ public enum Auto{readImage, left, center, right, dispense, end }
 
     @Override
     public void loop() {
+        robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         switch (blueSide) {
             case readImage:
                 if (location != 0) {
-                    if (location == 1) {
-                        blueSide = left;
-                    }
+                   blueSide = offStone;
+                }
+                break;
+            case offStone:
+                robo.FRMotor.setTargetPosition(2272);
+                if (robo.FRMotor.getCurrentPosition()!=2272){
+                    robo.strafeRight(.5);
 
-                    if (location == 2) {
-                        blueSide = center;
-                    }
-                    if (location == 3) {
-                        blueSide = right;
-                    }
                 }
                 break;
             case left:
