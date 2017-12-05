@@ -29,12 +29,19 @@
 
 package org.firstinspires.ftc.team535;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -81,6 +88,13 @@ public class HardwareTOBOR
         Unknown
     }
 
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
+    double heading = 0;
+    int rotations = 0;
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
 
@@ -118,7 +132,19 @@ public class HardwareTOBOR
         leftTrack.setPower(0);
 
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
         // Define and initialize ALL installed servos.
 
     }
@@ -127,7 +153,7 @@ public class HardwareTOBOR
     {
         int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        parameters.vuforiaLicenseKey = "ATsODcD/////AAAAAVw2lR...d45oGpdljdOh5LuFB9nDNfckoxb8COxKSFX";
+        parameters.vuforiaLicenseKey = "AcZlc3n/////AAAAGWPeDCNLuk38gPuwF9cpyK2BYbGciGSeJy9AkSXPprQUEtg/VxgqB6j9WJuQvGo4pq+h4gwPSd134WD707FXnbuJjqdqkh5/92mATPs96WQ2RVoaU8QLbsJonufIl2T6qqqT83aOJHbz34mGJszad+Mw7VAWM11av5ltOoq8/rSKbmSFxAVi3d7oiT3saE0XBx4svhpGLwauy6Y0L7X0fC7FwHKCnw/RPL4V+Q8v2rtCTOwvjfnjxmRMind01HSWcxd9ppBwzvHVCPhePccnyWVv5jNiYXia9r4FlrJpAPgZ1GsCfdbt6AoT6Oh2Hnx267J+MHUnLi/C+0brvnQfcDregLBfnZApfd2c1WDiXJp/";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
@@ -146,12 +172,31 @@ public class HardwareTOBOR
         FLMotor.setPower(-power);
     }
 
+    public void strafeLeftAuto (double power)
+    {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double adjustment = angles.firstAngle/180*0.3;
+        BLMotor.setPower(power + adjustment);
+        BRMotor.setPower(-power - adjustment);
+        FRMotor.setPower(power - adjustment);
+        FLMotor.setPower(-power + adjustment);
+    }
     public void strafeRight(double power)
     {
         BLMotor.setPower(-power);
         BRMotor.setPower(power);
         FRMotor.setPower(-power);
         FLMotor.setPower(power);
+    }
+
+    public void strafeRightAuto(double power)
+    {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double adjustment = angles.firstAngle/180*0.29;
+        BLMotor.setPower(-power + adjustment);
+        BRMotor.setPower(power - adjustment);
+        FRMotor.setPower(-power - adjustment);
+        FLMotor.setPower(power + adjustment);
     }
 
     public TOBORVuMarkIdentification.Crypto seekImage()
