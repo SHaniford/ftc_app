@@ -31,17 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.team535;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "TOBOR Tank Drive", group = "Teleop")
+@TeleOp(name = "Servo Test", group = "Teleop")
 //@Disabled
 
-public class TOBORTank extends OpMode {
+public class ServoTest extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
     double speedControl = 1;
@@ -65,82 +62,12 @@ public class TOBORTank extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.dpad_down)
-        {
-            speedControl = 0.5;
-        }
 
-        if (gamepad1.dpad_up)
-        {
-            speedControl = 1;
-        }
-
-        if (gamepad1.right_trigger >= 0.1) {
-            robo.strafeRight(gamepad1.right_trigger*speedControl);
-        } else if (gamepad1.left_trigger >= 0.1) {
-            robo.strafeLeft(gamepad1.left_trigger*speedControl);
-        } else {
-            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
-            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
-            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
-            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
-        }
-
-        if (toggleR)
-        {
-            if (gamepad2.right_bumper)
-            {
-                runningR = !runningR;
-                toggleR = false;
-            }
-        }
-        else if (!gamepad2.right_bumper)
-        {
-            toggleR = true;
-        }
-
-        else if (toggleL)
-        {
-            if (gamepad2.left_bumper)
-            {
-                runningL = !runningL;
-                toggleL = false;
-            }
-        }
-        else if (!gamepad2.left_bumper)
-        {
-            toggleL = true;
-        }
-
-        if (runningR)
-        {
-            robo.rightTrack.setPower(1);
-            robo.leftTrack.setPower(1);
-        }
-        else if (runningL)
-        {
-            robo.rightTrack.setPower(-1);
-            robo.leftTrack.setPower(-1);
-        }
-        else if (!runningL && !runningR)
-        {
-            robo.rightTrack.setPower(0);
-            robo.leftTrack.setPower(0);
-        }
+            robo.RPlate.setPosition(robo.RPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_stick_y)));
 
 
-        telemetry.addData("LPlate", robo.LPlate.getPosition());
-        telemetry.addData("RPlate", robo.RPlate.getPosition());
-        if (gamepad2.a)
-        {
-            robo.RPlate.setPosition(robo.RPlate.getPosition()+0.002);
-            robo.LPlate.setPosition(robo.LPlate.getPosition()-0.002);
-        }
-        else if (gamepad2.b)
-        {
-            robo.RPlate.setPosition(robo.RPlate.getPosition()-0.002);
-            robo.LPlate.setPosition(robo.LPlate.getPosition()+0.002);
-        }
+            robo.LPlate.setPosition(robo.LPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.left_stick_y)));
+
         telemetry.addData("RPlate", robo.RPlate.getPosition());
         telemetry.addData("LPlate", robo.LPlate.getPosition());
     }
