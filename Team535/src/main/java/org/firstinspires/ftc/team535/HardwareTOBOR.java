@@ -181,12 +181,13 @@ public class HardwareTOBOR
 
     public double strafeLeftAuto (double power)
     {
+        double distance = (16-rangeSensor.getDistance(DistanceUnit.INCH))/100;
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double adjustment = angles.firstAngle/40;
-        BLMotor.setPower(power - adjustment);
-        BRMotor.setPower(-power + adjustment);
-        FRMotor.setPower(power + adjustment);
-        FLMotor.setPower(-power - adjustment);
+        BLMotor.setPower(power - adjustment + distance);
+        BRMotor.setPower(-power + adjustment + distance );
+        FRMotor.setPower(power + adjustment + distance);
+        FLMotor.setPower(-power - adjustment + distance);
         return angles.firstAngle;
 
     }

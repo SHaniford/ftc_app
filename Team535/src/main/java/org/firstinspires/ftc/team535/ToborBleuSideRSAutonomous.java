@@ -32,8 +32,12 @@ package org.firstinspires.ftc.team535;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.VuMarkTarget;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 /**
@@ -56,8 +60,7 @@ public class ToborBleuSideRSAutonomous extends OpMode
 {
     public RelicRecoveryVuMark roboLocation;
     
-//Hey Steven, Log off <3
-    //Swag 420 Blaze it
+
     HardwareTOBOR robo = new HardwareTOBOR();
 public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spitout, end }
 
@@ -72,24 +75,7 @@ public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spi
 
     @Override
     public void init_loop() {
-        robo.seekImage();
-        if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
-        {
-            telemetry.addData("Vumark Left","Acquired");
 
-        }
-        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
-        {
-            telemetry.addData("Vumark Center","Acquired");
-        }
-        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Right)
-        {
-            telemetry.addData("Vumark Right","Acquired");
-        }
-        else
-        {
-            telemetry.addData("Vumark", "Unknown");
-        }
     }
 
 
