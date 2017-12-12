@@ -32,6 +32,7 @@ package org.firstinspires.ftc.team535;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -68,7 +69,7 @@ import java.lang.Math;
  */
 
 @Autonomous(name="TOBORBleuSideLSAutonomous", group="Autonomous")
-//@Disabled
+@Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {
     double TPI = 43;
@@ -89,26 +90,11 @@ blueSide = readImage;
 
     @Override
     public void init_loop() {
-        if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN)
+
         {
             vuMark = robo.readKey();
             telemetry.addData("Vumark Acquired", vuMark);
         }
-        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-    }
-    @Override
-    public void start()
-    {
-        robo.stopVuforia();
-        robo.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robo.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robo.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robo.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
@@ -178,6 +164,7 @@ robo.BLMotor.setPower(0);
                 robo.FRMotor.setPower(0);
                 break;
                 }
+
     }
     @Override
     public void stop() {
