@@ -30,6 +30,9 @@
 package org.firstinspires.ftc.team535;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,37 +40,32 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import java.lang.Math;
 
-/**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name="TOBORRedSideAutonomous", group="Autonomous")
+
+
+@Autonomous(name="TOBORRedSideAutonomous", group="Autonomous")
 //@Disabled
 public class ToborRedSideAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
-    TOBORVuMarkIdentification.Crypto CryptoColumn;
+    double heading;
     public enum state{
         DRIVEOFFSTONE,
         SEEKCOLUMN,
+        LEFT,
+        CENTER,
         MOVEFORWARD,
         PLACEBLOCK,
-        BACKUP
+        BACKUP,
+        STOPALL
 
     }
-    //double TPI = 1120/(4*Math.PI);
-    int TPI = 93;
+
+    double TPI = 43;
     state currentState = state.DRIVEOFFSTONE;
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
+    
     @Override
     public void init()
     {
@@ -75,35 +73,18 @@ public class ToborRedSideAutonomous extends OpMode
         telemetry.addData("Status", "Initialized");
         robo.initRobo(hardwareMap);
         robo.initVuforia();
-        robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robo.startVuforia();
+        
     }
 
 
     @Override
     public void init_loop()
     {
-        robo.seekImage();
-        if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
+        if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN)
         {
-            telemetry.addData("Vumark Left","Acquired");
-            CryptoColumn = TOBORVuMarkIdentification.Crypto.Left;
-        }
-        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
-        {
-            telemetry.addData("Vumark Center","Acquired");
-            CryptoColumn = TOBORVuMarkIdentification.Crypto.Center;
-        }
-        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Right)
-        {
-            telemetry.addData("Vumark Right","Acquired");
-            CryptoColumn = TOBORVuMarkIdentification.Crypto.Right;
-        }
-        else
-        {
-            telemetry.addData("Vumark", "Unknown");
+            vuMark = robo.readKey();
+            telemetry.addData("Vumark Acquired", vuMark);
         }
         robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -116,25 +97,75 @@ public class ToborRedSideAutonomous extends OpMode
     @Override
     public void start()
     {
-
+        robo.stopVuforia();
+        robo.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        
     }
 
     @Override
     public void loop()
     {
-        robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        telemetry.addData("BRMotor", robo.BRMotor.getCurrentPosition());
         switch (currentState){
             case DRIVEOFFSTONE:
-                robo.BRMotor.setTargetPosition(-24*TPI);
-                robo.BLMotor.setTargetPosition(24*TPI);
-                robo.FRMotor.setTargetPosition(24*TPI);
-                robo.FLMotor.setTargetPosition(-24*TPI);
-                robo.strafeLeftAuto(0.7);
+                heading = robo.strafeRightAuto(0.35);
+                if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    currentState = state.SEEKCOLUMN;
+                }
+            break;
+            case SEEKCOLUMN:
+                if (vuMark == RelicRecoveryVuMark.RIGHT)
+                {
+                    currentState = state.MOVEFORWARD;
+                }
+                
+                else if (vuMark == RelicRecoveryVuMark.CENTER)
+                {
+                    currentState = state.CENTER;
+                }
+                else if (vuMark == RelicRecoveryVuMark.LEFT)
+                {
+                    currentState = state.LEFT;
+                }
+                break;
+            case CENTER:
+               heading = robo.strafeRightAuto(0.35);
+               telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
+                if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    currentState = state.MOVEFORWARD;
+                }
+                break;
+            case LEFT:
+                heading = robo.strafeRightAuto(0.35);
+                if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    currentState = state.MOVEFORWARD;
+                }
+                break;
+            case MOVEFORWARD:
+                robo.DriveForwardAuto(-0.2);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
+                {
+                    currentState = state.STOPALL;
+                }
+                
+                break;
+            case STOPALL:
+            
+                robo.BRMotor.setPower(0);
+                robo.FRMotor.setPower(0);
+                robo.BLMotor.setPower(0);
+                robo.FLMotor.setPower(0);
+            
             break;
         }
+        telemetry.addData("1", "heading: " + heading);
+        
 
 
 
