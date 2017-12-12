@@ -92,6 +92,7 @@ public class TOBORTank extends OpMode {
             {
                 runningR = !runningR;
                 toggleR = false;
+                runningL = false;
             }
         }
         else if (!gamepad2.right_bumper)
@@ -99,11 +100,12 @@ public class TOBORTank extends OpMode {
             toggleR = true;
         }
 
-        else if (toggleL)
+        if (toggleL)
         {
             if (gamepad2.left_bumper)
             {
                 runningL = !runningL;
+                runningR = false;
                 toggleL = false;
             }
         }
@@ -128,18 +130,15 @@ public class TOBORTank extends OpMode {
             robo.leftTrack.setPower(0);
         }
 
-
-        telemetry.addData("LPlate", robo.LPlate.getPosition());
-        telemetry.addData("RPlate", robo.RPlate.getPosition());
         if (gamepad2.a)
         {
-            robo.RPlate.setPosition(robo.RPlate.getPosition()+0.002);
-            robo.LPlate.setPosition(robo.LPlate.getPosition()-0.002);
+            robo.RPlate.setPosition(.8783);
+            robo.LPlate.setPosition(.1861);
         }
         else if (gamepad2.b)
         {
-            robo.RPlate.setPosition(robo.RPlate.getPosition()-0.002);
-            robo.LPlate.setPosition(robo.LPlate.getPosition()+0.002);
+            robo.RPlate.setPosition(.0916);
+            robo.LPlate.setPosition(.9894);
         }
         telemetry.addData("RPlate", robo.RPlate.getPosition());
         telemetry.addData("LPlate", robo.LPlate.getPosition());
