@@ -62,7 +62,7 @@ import java.lang.Math;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TOBORBleuSideLSAutonomous", group="Autonomous")
+@Autonomous(name="TOBORBleuSideLSAutonomous", group="Autonomous")
 //@Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {

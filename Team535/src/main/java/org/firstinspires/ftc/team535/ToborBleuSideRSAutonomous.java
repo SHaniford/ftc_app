@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.team535;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.vuforia.VuMarkTarget;
@@ -49,7 +50,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TOBORBleuSideRSAutonomous", group="Autonomous")
+@Autonomous(name="TOBORBleuSideRSAutonomous", group="Autonomous")
 //@Disabled
 public class ToborBleuSideRSAutonomous extends OpMode
 {
