@@ -30,6 +30,9 @@
 package org.firstinspires.ftc.team535;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -47,25 +50,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-/**
- * This is NOT an opmode.
- *
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a Pushbot.
- * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
- *
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have single spaces between words.
- *
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"
- * Servo channel:  Servo to open right claw: "right_hand"
- */
+
 public class HardwareTOBOR
 {
-    /* Public OpMode members. */
     DcMotor FRMotor;
     DcMotor FLMotor;
     DcMotor BRMotor;
@@ -74,12 +61,15 @@ public class HardwareTOBOR
     DcMotor leftTrack;
     Servo RPlate;
     Servo LPlate;
+    
+    ModernRoboticsI2cRangeSensor rangeSensor;
+    
 
     VuforiaLocalizer vuforia;
+    
     VuforiaTrackables relicTrackables;
     VuforiaTrackable relicTemplate;
-    RelicRecoveryVuMark vuMark;
-    TOBORVuMarkIdentification.Crypto cryptoLocation;
+    private VuforiaTrackableDefaultListener relicTemplateListener;
 
     public enum Crypto {
         Left,
@@ -117,6 +107,7 @@ public class HardwareTOBOR
         leftTrack = hwMap.dcMotor.get("LTrack");
         RPlate = hwMap.servo.get("RPlate");
         LPlate = hwMap.servo.get("LPlate");
+        rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range sensor");
 
 
         FRMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -155,14 +146,30 @@ public class HardwareTOBOR
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AcZlc3n/////AAAAGWPeDCNLuk38gPuwF9cpyK2BYbGciGSeJy9AkSXPprQUEtg/VxgqB6j9WJuQvGo4pq+h4gwPSd134WD707FXnbuJjqdqkh5/92mATPs96WQ2RVoaU8QLbsJonufIl2T6qqqT83aOJHbz34mGJszad+Mw7VAWM11av5ltOoq8/rSKbmSFxAVi3d7oiT3saE0XBx4svhpGLwauy6Y0L7X0fC7FwHKCnw/RPL4V+Q8v2rtCTOwvjfnjxmRMind01HSWcxd9ppBwzvHVCPhePccnyWVv5jNiYXia9r4FlrJpAPgZ1GsCfdbt6AoT6Oh2Hnx267J+MHUnLi/C+0brvnQfcDregLBfnZApfd2c1WDiXJp/";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.useExtendedTracking = false;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate");
-        vuMark = RelicRecoveryVuMark.from(relicTemplate);
-        relicTrackables.activate();
-        cryptoLocation = TOBORVuMarkIdentification.Crypto.Unknown;
+        relicTemplateListener = (VuforiaTrackableDefaultListener) relicTemplate.getListener();
     }
+    public void startVuforia()
+    {
+        relicTrackables.activate();
+    }
+    public void stopVuforia()
+    {
+        relicTrackables.deactivate();
+    }
+    public RelicRecoveryVuMark readKey()
+    {
+        return RelicRecoveryVuMark.from(relicTemplate);
+    }
+
+
+
+
 
     public void strafeLeft(double power)
     {
@@ -172,14 +179,16 @@ public class HardwareTOBOR
         FLMotor.setPower(-power);
     }
 
-    public void strafeLeftAuto (double power)
+    public double strafeLeftAuto (double power)
     {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double adjustment = angles.firstAngle/180*0.3;
-        BLMotor.setPower(power + adjustment);
-        BRMotor.setPower(-power - adjustment);
-        FRMotor.setPower(power - adjustment);
-        FLMotor.setPower(-power + adjustment);
+        double adjustment = angles.firstAngle/40;
+        BLMotor.setPower(power - adjustment);
+        BRMotor.setPower(-power + adjustment);
+        FRMotor.setPower(power + adjustment);
+        FLMotor.setPower(-power - adjustment);
+        return angles.firstAngle;
+
     }
     public void strafeRight(double power)
     {
@@ -189,35 +198,28 @@ public class HardwareTOBOR
         FLMotor.setPower(power);
     }
 
-    public void strafeRightAuto(double power)
+    public double strafeRightAuto(double power)
+    {
+        double distance = (16-rangeSensor.getDistance(DistanceUnit.INCH))/100;
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double adjustment = angles.firstAngle/40;
+        BLMotor.setPower(-power - adjustment +distance);
+        BRMotor.setPower(power + adjustment + distance);
+        FRMotor.setPower(-power + adjustment + distance);
+        FLMotor.setPower(power - adjustment + distance);
+        return angles.firstAngle;
+
+    }
+        public double DriveForwardAuto(double power)
     {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double adjustment = angles.firstAngle/180*0.29;
-        BLMotor.setPower(-power + adjustment);
-        BRMotor.setPower(power - adjustment);
-        FRMotor.setPower(-power - adjustment);
-        FLMotor.setPower(power + adjustment);
-    }
+        double adjustment = angles.firstAngle/40;
+        BLMotor.setPower(power - adjustment);
+        BRMotor.setPower(power + adjustment);
+        FRMotor.setPower(power + adjustment);
+        FLMotor.setPower(power - adjustment);
+        return angles.firstAngle;
 
-    public TOBORVuMarkIdentification.Crypto seekImage()
-    {
-        if(vuMark == RelicRecoveryVuMark.LEFT){
-            cryptoLocation = TOBORVuMarkIdentification.Crypto.Left;
-
-        } else if (vuMark == RelicRecoveryVuMark.CENTER) {
-            cryptoLocation = TOBORVuMarkIdentification.Crypto.Center;
-
-        }
-        else if (vuMark == RelicRecoveryVuMark.RIGHT){
-            cryptoLocation = TOBORVuMarkIdentification.Crypto.Right;
-
-        }
-
-        if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-
-
-        }
-        return cryptoLocation;
     }
  }
 
