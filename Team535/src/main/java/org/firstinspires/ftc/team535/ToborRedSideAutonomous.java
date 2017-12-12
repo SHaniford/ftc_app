@@ -69,7 +69,8 @@ public class ToborRedSideAutonomous extends OpMode
     @Override
     public void init()
     {
-
+        robo.RPlate.setPosition(.81);
+        robo.LPlate.setPosition(.27);
         telemetry.addData("Status", "Initialized");
         robo.initRobo(hardwareMap);
         robo.initVuforia();
@@ -118,7 +119,7 @@ public class ToborRedSideAutonomous extends OpMode
                 }
             break;
             case SEEKCOLUMN:
-                if (vuMark == RelicRecoveryVuMark.RIGHT)
+                if (vuMark == RelicRecoveryVuMark.RIGHT || vuMark == RelicRecoveryVuMark.UNKNOWN)
                 {
                     currentState = state.MOVEFORWARD;
                 }
@@ -151,11 +152,17 @@ public class ToborRedSideAutonomous extends OpMode
                 robo.DriveForwardAuto(-0.2);
                 if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
                 {
-                    currentState = state.STOPALL;
+                    currentState = state.PLACEBLOCK;
                 }
                 
                 break;
             case PLACEBLOCK:
+                robo.RPlate.setPosition(.08);
+                robo.LPlate.setPosition(1);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 2)
+                {
+                    currentState = state.STOPALL;
+                }
                 break;
             case STOPALL:
             
@@ -166,6 +173,7 @@ public class ToborRedSideAutonomous extends OpMode
             
             break;
         }
+        telemetry.addData("State", currentState);
         telemetry.addData("1", "heading: " + heading);
         
 
