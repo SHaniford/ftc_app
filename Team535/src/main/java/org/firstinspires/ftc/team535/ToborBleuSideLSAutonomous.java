@@ -41,9 +41,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.center;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.dispense;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.end;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.forward;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.left;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.offStone;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readImage;
@@ -67,96 +72,96 @@ import java.lang.Math;
 @Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {
-    HardwareTOBOR robo = new HardwareTOBOR();
-public enum Auto{readImage, offStone, left, center, right, dispense, end }
-    public int location;
+    double TPI = 43;
+public enum Auto{readImage, offStone, left, center, right, forward, dispense, end }
     Auto blueSide;
-    BNO055IMU imu;
-    Orientation angles;
-    Acceleration gravity;
-    double heading = 0;
-    int rotations = 0;
+    HardwareTOBOR robo = new HardwareTOBOR();
+    double heading;
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
     @Override
     public void init() {
-        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
-    robo.initRobo(hardwareMap);
+        robo.initRobo(hardwareMap);
         robo.initVuforia();
-        blueSide = readImage;
-        location = 0;
+        robo.startVuforia();
+blueSide = readImage;
     }
 
 
     @Override
     public void init_loop() {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
+        {
+            vuMark = robo.readKey();
+            telemetry.addData("Vumark Acquired", vuMark);
+        }
 
-        /*telemetry.addData("2", "heading: " + angles.firstAngle);
-        robo .seekImage();
-        if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
-        {
-            telemetry.addData("Vumark Left","Acquired");
-            location = 1;
-        }
-        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Center)
-        {
-            telemetry.addData("Vumark Center","Acquired");
-            location = 2;
-        }
-        else if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Right)
-        {
-            telemetry.addData("Vumark Right","Acquired");
-            location = 3;
-        }
-        else
-        {
-            telemetry.addData("Vumark", "Unknown");
-            location = 0;
-        }
-        */
     }
 
     @Override
     public void loop() {
-        robo.BLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         switch (blueSide) {
             case readImage:
-                if (location != 0) {
+                if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN) {
                    blueSide = offStone;
                 }
                 break;
             case offStone:
-                robo.FRMotor.setTargetPosition(2272);
-                if (robo.FRMotor.getCurrentPosition()!=2272){
-                    robo.strafeRight(.5);
-
+                if (robo.FRMotor.getCurrentPosition() == 2272){
+                    robo.strafeLeftAuto(0);
+                    if (robo.readKey() == RelicRecoveryVuMark.LEFT) {
+                        blueSide = left;
+                    }
+                    if (robo.readKey() == RelicRecoveryVuMark.CENTER) {
+                        blueSide = center;
+                    }
+                    if (robo.readKey() == RelicRecoveryVuMark.RIGHT) {
+                        blueSide = right;
+                    }
                 }
                 break;
             case left:
-
+                heading = robo.strafeRightAuto(0.35);
+                if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    blueSide = forward;
+                }
                 break;
             case center:
-
+                heading = robo.strafeRightAuto(0.35);
+                telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
+                if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+blueSide = forward;
+                }
                 break;
             case right:
-
+                heading = robo.strafeRightAuto(0.35);
+                if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    blueSide = forward;
+                }
+                break;
+            case forward:
+                robo.DriveForwardAuto(-0.2);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
+                {
+                    blueSide=dispense;
+                }
+                break;
+            case dispense:
+ robo.RPlate.setPosition(.08);
+                robo.LPlate.setPosition(1);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 2)
+                {
+                    blueSide=end;
+                }
+                break;
+            case end:
+robo.BLMotor.setPower(0);
+                robo.FLMotor.setPower(0);
+                robo.BRMotor.setPower(0);
+                robo.FRMotor.setPower(0);
                 break;
                 }
 
