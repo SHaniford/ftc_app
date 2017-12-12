@@ -62,7 +62,7 @@ import java.lang.Math;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TOBORBleuSideLSAutonomous", group="Autonomous")
+@Autonomous(name="TOBORBleuSideLSAutonomous", group="Autonomous")
 //@Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {
@@ -77,7 +77,10 @@ public enum Auto{readImage, offStone, left, center, right, dispense, end }
     int rotations = 0;
     @Override
     public void init() {
-
+        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -99,7 +102,7 @@ public enum Auto{readImage, offStone, left, center, right, dispense, end }
     public void init_loop() {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        telemetry.addData("1", "Integrated Heading: " + getIntegratedHeading());
+
         telemetry.addData("2", "heading: " + angles.firstAngle);
         robo.seekImage();
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
@@ -130,7 +133,7 @@ public enum Auto{readImage, offStone, left, center, right, dispense, end }
         robo.BRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robo.FLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robo.FRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         switch (blueSide) {
             case readImage:
                 if (location != 0) {
