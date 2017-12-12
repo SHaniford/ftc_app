@@ -155,6 +155,8 @@ public class ToborRedSideAutonomous extends OpMode
                 }
                 
                 break;
+            case PLACEBLOCK:
+                break;
             case STOPALL:
             
                 robo.BRMotor.setPower(0);

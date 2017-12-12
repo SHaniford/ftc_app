@@ -32,6 +32,7 @@ package org.firstinspires.ftc.team535;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -63,7 +64,7 @@ import java.lang.Math;
  */
 
 @Autonomous(name="TOBORBleuSideLSAutonomous", group="Autonomous")
-//@Disabled
+@Disabled
 public class ToborBleuSideLSAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
@@ -103,8 +104,8 @@ public enum Auto{readImage, offStone, left, center, right, dispense, end }
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
 
-        telemetry.addData("2", "heading: " + angles.firstAngle);
-        robo.seekImage();
+        /*telemetry.addData("2", "heading: " + angles.firstAngle);
+        robo .seekImage();
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");
@@ -125,6 +126,7 @@ public enum Auto{readImage, offStone, left, center, right, dispense, end }
             telemetry.addData("Vumark", "Unknown");
             location = 0;
         }
+        */
     }
 
     @Override
@@ -157,6 +159,7 @@ public enum Auto{readImage, offStone, left, center, right, dispense, end }
 
                 break;
                 }
+
     }
     @Override
     public void stop() {

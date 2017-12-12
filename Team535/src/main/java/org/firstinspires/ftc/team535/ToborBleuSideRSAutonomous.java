@@ -72,7 +72,7 @@ public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spi
 
     @Override
     public void init_loop() {
-        robo.seekImage();
+        /*robo.seekImage();
         if (robo.cryptoLocation == TOBORVuMarkIdentification.Crypto.Left)
         {
             telemetry.addData("Vumark Left","Acquired");
@@ -89,7 +89,7 @@ public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spi
         else
         {
             telemetry.addData("Vumark", "Unknown");
-        }
+        }*/
     }
 
 
