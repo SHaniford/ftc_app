@@ -72,7 +72,7 @@ import java.lang.Math;
 public class ToborBleuSideLSAutonomous extends OpMode
 {
     double TPI = 43;
-public enum Auto{readImage, offStone, left, center, right, forward, dispense, end }
+public enum Auto{readImage, offStone, left, center, right, forward, dispense, jolt, end }
     Auto blueSide;
     HardwareTOBOR robo = new HardwareTOBOR();
     double heading;
@@ -121,8 +121,6 @@ blueSide = readImage;
                 }
                 break;
             case offStone:
-                if (robo.FRMotor.getCurrentPosition() == 2272){
-                    robo.strafeLeftAuto(0);
                     if (robo.readKey() == RelicRecoveryVuMark.LEFT) {
                         blueSide = left;
                     }
@@ -132,17 +130,17 @@ blueSide = readImage;
                     if (robo.readKey() == RelicRecoveryVuMark.RIGHT) {
                         blueSide = right;
                     }
-                }
+
                 break;
             case left:
-                heading = robo.strafeRightAuto(0.35);
+                heading = robo.strafeLeftAuto(0.35);
                 if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
                     blueSide = forward;
                 }
                 break;
             case center:
-                heading = robo.strafeRightAuto(0.35);
+                heading = robo.strafeLeftAuto(0.35);
                 telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
                 if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
@@ -150,7 +148,7 @@ blueSide = forward;
                 }
                 break;
             case right:
-                heading = robo.strafeRightAuto(0.35);
+                heading = robo.strafeLeftAuto(0.35);
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
                     blueSide = forward;
