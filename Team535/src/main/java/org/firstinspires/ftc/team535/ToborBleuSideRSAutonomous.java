@@ -30,8 +30,8 @@
 package org.firstinspires.ftc.team535;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.VuMarkTarget;
 
@@ -55,7 +55,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
  */
 
 @Autonomous(name="TOBORBleuSideRSAutonomous", group="Autonomous")
-//@Disabled
+@Disabled
 public class ToborBleuSideRSAutonomous extends OpMode
 {
     public RelicRecoveryVuMark roboLocation;

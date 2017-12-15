@@ -32,6 +32,7 @@ package org.firstinspires.ftc.team535;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,6 +49,7 @@ import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.cente
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.dispense;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.end;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.forward;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.jolt;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.left;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.offStone;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readImage;
@@ -83,24 +85,27 @@ public enum Auto{readImage, offStone, left, center, right, forward, dispense, jo
         robo.initRobo(hardwareMap);
         robo.initVuforia();
         robo.startVuforia();
+        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 blueSide = readImage;
     }
 
 
     @Override
-    public void init_loop() {
+    public void init_loop()
+    {
         if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN)
         {
             vuMark = robo.readKey();
             telemetry.addData("Vumark Acquired", vuMark);
         }
-        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
 
     }
+
+
+
     @Override
     public void start()
     {
@@ -112,29 +117,40 @@ blueSide = readImage;
 
     }
 
+
     @Override
     public void loop() {
+        telemetry.addData("Current Pos",robo.BRMotor.getCurrentPosition());
+        telemetry.addData("Current State",blueSide);
         switch (blueSide) {
             case readImage:
-                if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN) {
+                if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
                    blueSide = offStone;
                 }
                 break;
             case offStone:
+<<<<<<< HEAD
                     if (robo.readKey() == RelicRecoveryVuMark.LEFT) {
+=======
+                    if (vuMark == RelicRecoveryVuMark.LEFT) {
+>>>>>>> origin/master
                         blueSide = left;
                     }
-                    if (robo.readKey() == RelicRecoveryVuMark.CENTER) {
+                    if (vuMark == RelicRecoveryVuMark.CENTER) {
                         blueSide = center;
                     }
-                    if (robo.readKey() == RelicRecoveryVuMark.RIGHT) {
+                    if (vuMark == RelicRecoveryVuMark.RIGHT) {
                         blueSide = right;
                     }
 
                 break;
             case left:
                 heading = robo.strafeLeftAuto(0.35);
+<<<<<<< HEAD
                 if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+=======
+                if ((25*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+>>>>>>> origin/master
                 {
                     blueSide = forward;
                 }
@@ -142,21 +158,25 @@ blueSide = readImage;
             case center:
                 heading = robo.strafeLeftAuto(0.35);
                 telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
-                if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                if (((36*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
 blueSide = forward;
                 }
                 break;
             case right:
                 heading = robo.strafeLeftAuto(0.35);
+<<<<<<< HEAD
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+=======
+                if (((46*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+>>>>>>> origin/master
                 {
                     blueSide = forward;
                 }
                 break;
             case forward:
                 robo.DriveForwardAuto(-0.2);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 9.75)
                 {
                     blueSide=dispense;
                 }
@@ -164,7 +184,18 @@ blueSide = forward;
             case dispense:
  robo.RPlate.setPosition(.08);
                 robo.LPlate.setPosition(1);
+                robo.BRMotor.setPower(0);
+                robo.FRMotor.setPower(0);
+                robo.BLMotor.setPower(0);
+                robo.FLMotor.setPower(0);
                 if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 2)
+                {
+                    blueSide=jolt;
+                }
+                break;
+            case jolt:
+                robo.DriveForwardAuto(0.2);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)>= 10)
                 {
                     blueSide=end;
                 }
@@ -176,6 +207,7 @@ robo.BLMotor.setPower(0);
                 robo.FRMotor.setPower(0);
                 break;
                 }
+
     }
     @Override
     public void stop() {
