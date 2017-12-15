@@ -121,6 +121,8 @@ public class HardwareTOBOR
         BLMotor.setPower(0);
         rightTrack.setPower(0);
         leftTrack.setPower(0);
+        RPlate.setPosition(.81);
+        LPlate.setPosition(.27);
 
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

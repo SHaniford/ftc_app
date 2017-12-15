@@ -29,23 +29,17 @@
 
 package org.firstinspires.ftc.team535;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import java.lang.Math;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 
-
-@Autonomous(name="TOBORRedSideAutonomous", group="Autonomous")
+@Autonomous(name="TOBORBlueSideAutonomousGreenwood", group="Autonomous")
 //@Disabled
-public class ToborRedSideAutonomous extends OpMode
+public class ToborBlueSideAutonomousGreenwood extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
     double heading;
@@ -109,7 +103,7 @@ public class ToborRedSideAutonomous extends OpMode
         telemetry.addData("BRMotor", robo.BRMotor.getCurrentPosition());
         switch (currentState){
             case DRIVEOFFSTONE:
-                heading = robo.strafeRightAuto(0.35);
+                heading = robo.strafeLeftAuto(0.35);
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
                     currentState = state.SEEKCOLUMN;
@@ -131,7 +125,7 @@ public class ToborRedSideAutonomous extends OpMode
                 }
                 break;
             case CENTER:
-               heading = robo.strafeRightAuto(0.35);
+               heading = robo.strafeLeftAuto(0.35);
                telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
                 if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
@@ -139,7 +133,7 @@ public class ToborRedSideAutonomous extends OpMode
                 }
                 break;
             case LEFT:
-                heading = robo.strafeRightAuto(0.35);
+                heading = robo.strafeLeftAuto(0.35);
                 if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
                     currentState = state.MOVEFORWARD;
