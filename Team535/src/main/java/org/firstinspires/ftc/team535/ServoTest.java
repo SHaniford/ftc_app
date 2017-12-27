@@ -78,7 +78,7 @@ public class ServoTest extends OpMode {
         robo.BRMotor.setPower(0);
         robo.FLMotor.setPower(0);
         robo.BLMotor.setPower(0);
-        robo.rightTrack.setPower(0);
-        robo.leftTrack.setPower(0);
+        robo.rightTrackUp.setPower(0);
+        robo.leftTrackUp.setPower(0);
     }
 }

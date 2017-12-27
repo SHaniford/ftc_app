@@ -35,6 +35,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -57,8 +58,10 @@ public class HardwareTOBOR
     DcMotor FLMotor;
     DcMotor BRMotor;
     DcMotor BLMotor;
-    DcMotor rightTrack;
-    DcMotor leftTrack;
+    DcMotor rightTrackUp;
+    DcMotor rightTrackDown;
+    DcMotor leftTrackUp;
+    DcMotor leftTrackDown;
     Servo RPlate;
     Servo LPlate;
     
@@ -103,8 +106,10 @@ public class HardwareTOBOR
         FLMotor = hwMap.dcMotor.get("FLeft");
         BRMotor = hwMap.dcMotor.get("BRight");
         BLMotor = hwMap.dcMotor.get("BLeft");
-        rightTrack = hwMap.dcMotor.get("RTrack");
-        leftTrack = hwMap.dcMotor.get("LTrack");
+        rightTrackUp = hwMap.dcMotor.get("RTrackUp");
+        rightTrackDown = hwMap.dcMotor.get("RTrackDown");
+        leftTrackUp = hwMap.dcMotor.get("LTrackUp");
+        leftTrackDown = hwMap.dcMotor.get("LTrackDown");
         RPlate = hwMap.servo.get("RPlate");
         LPlate = hwMap.servo.get("LPlate");
         rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range sensor");
@@ -112,15 +117,18 @@ public class HardwareTOBOR
 
         FRMotor.setDirection(DcMotor.Direction.REVERSE);
         BRMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightTrack.setDirection(DcMotor.Direction.REVERSE);
+        rightTrackUp.setDirection(DcMotor.Direction.REVERSE);
+        leftTrackUp.setDirection(DcMotor.Direction.REVERSE);
 
         // Set all motors to zero power
         FRMotor.setPower(0);
         FLMotor.setPower(0);
         BRMotor.setPower(0);
         BLMotor.setPower(0);
-        rightTrack.setPower(0);
-        leftTrack.setPower(0);
+        rightTrackUp.setPower(0);
+        rightTrackDown.setPower(0);
+        leftTrackUp.setPower(0);
+        leftTrackDown.setPower(0);
         RPlate.setPosition(.81);
         LPlate.setPosition(.27);
 

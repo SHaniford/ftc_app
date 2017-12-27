@@ -118,7 +118,7 @@ public class ToborRedSideAutonomous extends OpMode
             case SEEKCOLUMN:
                 if (vuMark == RelicRecoveryVuMark.RIGHT || vuMark == RelicRecoveryVuMark.UNKNOWN)
                 {
-                    currentState = state.MOVEFORWARD;
+                    currentState = state.PLACEBLOCK ;
                 }
                 
                 else if (vuMark == RelicRecoveryVuMark.CENTER)
@@ -135,21 +135,21 @@ public class ToborRedSideAutonomous extends OpMode
                telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
                 if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
-                    currentState = state.MOVEFORWARD;
+                    currentState = state.PLACEBLOCK;
                 }
                 break;
             case LEFT:
                 heading = robo.strafeRightAuto(0.35);
                 if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
-                    currentState = state.MOVEFORWARD;
+                    currentState = state.PLACEBLOCK;
                 }
                 break;
             case MOVEFORWARD:
                 robo.DriveForwardAuto(-0.2);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 9.5)
                 {
-                    currentState = state.PLACEBLOCK;
+                    currentState = state.STOPALL;
                 }
                 
                 break;
@@ -160,9 +160,18 @@ public class ToborRedSideAutonomous extends OpMode
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);
                 robo.FLMotor.setPower(0);
+                currentState = state.MOVEFORWARD;
+                break;
+            case BACKUP:
+                robo.DriveForwardAuto(0.2);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH) <= 4)
+                {
+                    currentState = state.STOPALL;
+                }
                 break;
             case STOPALL:
-            
+                robo.RPlate.setPosition(.81);
+                robo.LPlate.setPosition(.27);
                 robo.BRMotor.setPower(0);
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);

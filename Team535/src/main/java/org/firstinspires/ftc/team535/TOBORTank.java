@@ -45,10 +45,15 @@ public class TOBORTank extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
     double speedControl = 1;
-    boolean toggleR = false;
-    boolean runningR = false;
-    boolean toggleL = false;
-    boolean runningL = false;
+    boolean toggleRB = false;
+    boolean runningRB = false;
+    boolean toggleLB = false;
+    boolean runningLB = false;
+
+    boolean toggleRT = false;
+    boolean runningRT = false;
+    boolean toggleLT = false;
+    boolean runningLT = false;
 
 
     @Override
@@ -86,56 +91,112 @@ public class TOBORTank extends OpMode {
             robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
         }
 
-        if (toggleR)
+        
+        
+        
+        
+        
+        
+        
+        if (toggleRB)
         {
             if (gamepad2.right_bumper)
             {
-                runningR = !runningR;
-                toggleR = false;
-                runningL = false;
+                runningRB = !runningRB;
+                toggleRB = false;
+                runningLB = false;
             }
         }
         else if (!gamepad2.right_bumper)
         {
-            toggleR = true;
+            toggleRB = true;
         }
 
-        if (toggleL)
+        if (toggleLB)
         {
             if (gamepad2.left_bumper)
             {
-                runningL = !runningL;
-                runningR = false;
-                toggleL = false;
+                runningLB = !runningLB;
+                runningRB = false;
+                toggleLB = false;
             }
         }
         else if (!gamepad2.left_bumper)
         {
-            toggleL = true;
+            toggleLB = true;
         }
 
-        if (runningR)
+        if (runningRB)
         {
-            robo.rightTrack.setPower(1);
-            robo.leftTrack.setPower(1);
+            robo.rightTrackUp.setPower(1);
+            robo.leftTrackUp.setPower(1);
         }
-        else if (runningL)
+        else if (runningLB)
         {
-            robo.rightTrack.setPower(-1);
-            robo.leftTrack.setPower(-1);
+            robo.rightTrackUp.setPower(-1);
+            robo.leftTrackUp.setPower(-1);
         }
-        else if (!runningL && !runningR)
+        else if (!runningLB && !runningRB)
         {
-            robo.rightTrack.setPower(0);
-            robo.leftTrack.setPower(0);
+            robo.rightTrackUp.setPower(0);
+            robo.leftTrackUp.setPower(0);
         }
 
+
+
+
+        if (toggleRT)
+        {
+            if (gamepad2.right_trigger >= 0.1)
+            {
+                runningRT = !runningRT;
+                toggleRT = false;
+                runningLT = false;
+            }
+        }
+        else if (!(gamepad2.right_trigger >= 0.1))
+        {
+            toggleRT = true;
+        }
+
+        if (toggleLT)
+        {
+            if (gamepad2.left_trigger >= 0.1)
+            {
+                runningLT = !runningLT;
+                runningRT = false;
+                toggleLT = false;
+            }
+        }
+        else if (!(gamepad2.left_trigger >= 0.1))
+        {
+            toggleLT = true;
+        }
+
+        if (runningRT)
+        {
+            robo.rightTrackDown.setPower(1);
+            robo.leftTrackDown.setPower(1);
+        }
+        else if (runningLT)
+        {
+            robo.rightTrackDown.setPower(-1);
+            robo.leftTrackDown.setPower(-1);
+        }
+        else if (!runningLT && !runningRT)
+        {
+            robo.rightTrackDown.setPower(0);
+            robo.leftTrackDown.setPower(0);
+        }
+
+        
+        
         if (gamepad2.a)
         {
             robo.RPlate.setPosition(.08);
             robo.LPlate.setPosition(1);
         }
-        else if (gamepad2.b)
+        else if (gamepad2.x)
         {
             robo.RPlate.setPosition(.81);
             robo.LPlate.setPosition(.27);
@@ -151,7 +212,9 @@ public class TOBORTank extends OpMode {
         robo.BRMotor.setPower(0);
         robo.FLMotor.setPower(0);
         robo.BLMotor.setPower(0);
-        robo.rightTrack.setPower(0);
-        robo.leftTrack.setPower(0);
+        robo.rightTrackUp.setPower(0);
+        robo.leftTrackUp.setPower(0);
+        robo.rightTrackDown.setPower(0);
+        robo.leftTrackDown.setPower(0);
     }
 }
