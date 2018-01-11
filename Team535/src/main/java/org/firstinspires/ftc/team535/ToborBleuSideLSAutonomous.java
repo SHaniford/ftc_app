@@ -188,7 +188,7 @@ blueSide = forward;
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);
                 robo.FLMotor.setPower(0);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 2)
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 8)
                 {
                     blueSide=jolt;
                 }

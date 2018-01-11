@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
 import java.lang.Math;
 
@@ -49,7 +50,10 @@ public class ToborRedSideAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
     double heading;
+    HardwareTOBOR.direction dir;
     public enum state{
+        READJEWEL,
+        HITJEWEL,
         DRIVEOFFSTONE,
         SEEKCOLUMN,
         LEFT,
@@ -72,6 +76,7 @@ public class ToborRedSideAutonomous extends OpMode
         robo.initRobo(hardwareMap);
         robo.initVuforia();
         robo.startVuforia();
+
         
     }
 
@@ -108,6 +113,35 @@ public class ToborRedSideAutonomous extends OpMode
     {
         telemetry.addData("BRMotor", robo.BRMotor.getCurrentPosition());
         switch (currentState){
+            case READJEWEL:
+                robo.arm(HardwareTOBOR.armPos.Down);
+                dir = robo.knockJewel(HardwareTOBOR.color.Red);
+                telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Red));
+                if (dir != HardwareTOBOR.direction.Unknown)
+                {
+                    currentState = state.HITJEWEL;
+                }
+                break;
+            case HITJEWEL:
+                if (dir == HardwareTOBOR.direction.Left)
+                {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.BRMotor.setPower(-0.3);
+                }
+                else if (dir == HardwareTOBOR.direction.Right)
+                {
+                    robo.BRMotor.setPower(-0.3);
+                    robo.FRMotor.setPower(-0.3);
+                    robo.BLMotor.setPower(0.3);
+                    robo.BRMotor.setPower(0.3);
+                }
+                else
+                {
+                    currentState = state.READJEWEL;
+                }
+                break;
             case DRIVEOFFSTONE:
                 heading = robo.strafeRightAuto(0.35);
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
@@ -118,7 +152,7 @@ public class ToborRedSideAutonomous extends OpMode
             case SEEKCOLUMN:
                 if (vuMark == RelicRecoveryVuMark.RIGHT || vuMark == RelicRecoveryVuMark.UNKNOWN)
                 {
-                    currentState = state.MOVEFORWARD;
+                    currentState = state.PLACEBLOCK ;
                 }
                 
                 else if (vuMark == RelicRecoveryVuMark.CENTER)
@@ -135,21 +169,21 @@ public class ToborRedSideAutonomous extends OpMode
                telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
                 if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
-                    currentState = state.MOVEFORWARD;
+                    currentState = state.PLACEBLOCK;
                 }
                 break;
             case LEFT:
                 heading = robo.strafeRightAuto(0.35);
                 if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
                 {
-                    currentState = state.MOVEFORWARD;
+                    currentState = state.PLACEBLOCK;
                 }
                 break;
             case MOVEFORWARD:
                 robo.DriveForwardAuto(-0.2);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 9.5)
                 {
-                    currentState = state.PLACEBLOCK;
+                    currentState = state.STOPALL;
                 }
                 
                 break;
@@ -160,9 +194,18 @@ public class ToborRedSideAutonomous extends OpMode
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);
                 robo.FLMotor.setPower(0);
+                currentState = state.MOVEFORWARD;
+                break;
+            case BACKUP:
+                robo.DriveForwardAuto(0.2);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH) <= 4)
+                {
+                    currentState = state.STOPALL;
+                }
                 break;
             case STOPALL:
-            
+                robo.RPlate.setPosition(.81);
+                robo.LPlate.setPosition(.27);
                 robo.BRMotor.setPower(0);
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);
