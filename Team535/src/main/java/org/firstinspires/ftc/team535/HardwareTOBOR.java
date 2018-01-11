@@ -29,11 +29,14 @@
 
 package org.firstinspires.ftc.team535;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -64,6 +67,8 @@ public class HardwareTOBOR
     DcMotor leftTrackDown;
     Servo RPlate;
     Servo LPlate;
+    Servo JArm;
+    ColorSensor armSensor;
     
     ModernRoboticsI2cRangeSensor rangeSensor;
     
@@ -80,7 +85,22 @@ public class HardwareTOBOR
         Right,
         Unknown
     }
-
+    public enum armPos{
+        Down,
+        Up,
+        Back
+    }
+    public enum color{
+        Red,
+        Blue
+    }
+    public enum direction
+    {
+        Right,
+        Left,
+        Unknown
+    }
+    float hsvValues[] = {0F,0F,0F};
     BNO055IMU imu;
 
     // State used for updating telemetry
@@ -113,12 +133,14 @@ public class HardwareTOBOR
         RPlate = hwMap.servo.get("RPlate");
         LPlate = hwMap.servo.get("LPlate");
         rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range sensor");
+        JArm = hwMap.servo.get("Arm");
+        armSensor = hwMap.colorSensor.get("armSensor");
 
 
         FRMotor.setDirection(DcMotor.Direction.REVERSE);
         BRMotor.setDirection(DcMotor.Direction.REVERSE);
         rightTrackUp.setDirection(DcMotor.Direction.REVERSE);
-        leftTrackUp.setDirection(DcMotor.Direction.REVERSE);
+        rightTrackDown.setDirection(DcMotor.Direction.REVERSE);
 
         // Set all motors to zero power
         FRMotor.setPower(0);
@@ -131,7 +153,7 @@ public class HardwareTOBOR
         leftTrackDown.setPower(0);
         RPlate.setPosition(.81);
         LPlate.setPosition(.27);
-
+        armSensor.enableLed(false);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -179,6 +201,61 @@ public class HardwareTOBOR
 
 
 
+
+  public void arm(armPos armPos)
+    {
+        if (armPos == HardwareTOBOR.armPos.Up)
+        {
+            JArm.setPosition(.28889);
+            armSensor.enableLed(false);
+        }
+        else if (armPos == HardwareTOBOR.armPos.Down)
+        {
+            JArm.setPosition(.9583);
+            armSensor.enableLed(true);
+        }
+        else if (armPos == HardwareTOBOR.armPos.Back)
+        {
+            JArm.setPosition(.1);
+            armSensor.enableLed(false);
+        }
+    }
+    public direction knockJewel (color targetColor)
+    {
+        if (targetColor == color.Red) {
+            Color.RGBToHSV(armSensor.red() * 8, armSensor.green() * 8, armSensor.blue() * 8, hsvValues);
+            if (hsvValues[0] >= 237 || hsvValues[0] <= 18) {
+                return direction.Left;
+            } else if (hsvValues[0] >= 152 && hsvValues[0] <= 191) {
+                return direction.Right;
+            }
+            else
+            {
+                return direction.Unknown;
+            }
+
+        }
+        else if (targetColor == color.Blue)
+        {
+            Color.RGBToHSV(armSensor.red() * 8, armSensor.green() * 8, armSensor.blue() * 8, hsvValues);
+            if (hsvValues[0] >= 237 || hsvValues[0] <= 18) {
+                return direction.Right;
+            } else if (hsvValues[0] >= 152 && hsvValues[0] <= 191) {
+                return direction.Left;
+            }
+            else
+            {
+                return direction.Unknown;
+            }
+
+        }
+        else
+        {
+            return direction.Unknown;
+        }
+
+
+    }
 
 
     public void strafeLeft(double power)

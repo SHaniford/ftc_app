@@ -44,7 +44,7 @@ import com.qualcomm.robotcore.util.Range;
 public class TOBORTank extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
-    double speedControl = 1;
+    double speedControl;
     boolean toggleRB = false;
     boolean runningRB = false;
     boolean toggleLB = false;
@@ -54,14 +54,15 @@ public class TOBORTank extends OpMode {
     boolean runningRT = false;
     boolean toggleLT = false;
     boolean runningLT = false;
-
-
+//poop
+    boolean toggleRunmode = false;
+    boolean fastRunmode = true;
     @Override
     public void init() {
 
         robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
-
+        robo.arm(HardwareTOBOR.armPos.Up);
     }
 
     @Override
@@ -70,15 +71,6 @@ public class TOBORTank extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.dpad_down)
-        {
-            speedControl = 0.5;
-        }
-
-        if (gamepad1.dpad_up)
-        {
-            speedControl = 1;
-        }
 
         if (gamepad1.right_trigger >= 0.1) {
             robo.strafeRight(gamepad1.right_trigger*speedControl);
@@ -91,118 +83,65 @@ public class TOBORTank extends OpMode {
             robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
         }
 
-        
-        
-        
-        
-        
-        
-        
-        if (toggleRB)
+
+        if (toggleRunmode)
         {
-            if (gamepad2.right_bumper)
+            if (gamepad1.right_stick_button)
             {
-                runningRB = !runningRB;
-                toggleRB = false;
-                runningLB = false;
+                fastRunmode = !fastRunmode;
+                toggleRunmode = false;
             }
         }
-        else if (!gamepad2.right_bumper)
+        else if (!(gamepad1.right_stick_button))
         {
-            toggleRB = true;
-        }
-
-        if (toggleLB)
-        {
-            if (gamepad2.left_bumper)
-            {
-                runningLB = !runningLB;
-                runningRB = false;
-                toggleLB = false;
-            }
-        }
-        else if (!gamepad2.left_bumper)
-        {
-            toggleLB = true;
-        }
-
-        if (runningRB)
-        {
-            robo.rightTrackUp.setPower(1);
-            robo.leftTrackUp.setPower(1);
-        }
-        else if (runningLB)
-        {
-            robo.rightTrackUp.setPower(-1);
-            robo.leftTrackUp.setPower(-1);
-        }
-        else if (!runningLB && !runningRB)
-        {
-            robo.rightTrackUp.setPower(0);
-            robo.leftTrackUp.setPower(0);
+            toggleRunmode = true;
         }
 
 
-
-
-        if (toggleRT)
+        if (fastRunmode)
         {
-            if (gamepad2.right_trigger >= 0.1)
-            {
-                runningRT = !runningRT;
-                toggleRT = false;
-                runningLT = false;
-            }
+            speedControl = 1;
         }
-        else if (!(gamepad2.right_trigger >= 0.1))
+        else if (!fastRunmode)
         {
-            toggleRT = true;
+            speedControl = 0.5;
         }
 
-        if (toggleLT)
-        {
-            if (gamepad2.left_trigger >= 0.1)
-            {
-                runningLT = !runningLT;
-                runningRT = false;
-                toggleLT = false;
-            }
-        }
-        else if (!(gamepad2.left_trigger >= 0.1))
-        {
-            toggleLT = true;
-        }
-
-        if (runningRT)
-        {
-            robo.rightTrackDown.setPower(1);
-            robo.leftTrackDown.setPower(1);
-        }
-        else if (runningLT)
-        {
-            robo.rightTrackDown.setPower(-1);
-            robo.leftTrackDown.setPower(-1);
-        }
-        else if (!runningLT && !runningRT)
-        {
-            robo.rightTrackDown.setPower(0);
-            robo.leftTrackDown.setPower(0);
-        }
+        robo.rightTrackDown.setPower(-Range.clip(gamepad2.left_stick_y, -1, 1));
+        robo.leftTrackDown.setPower(-Range.clip(gamepad2.left_stick_y, -1, 1));
+        robo.rightTrackUp.setPower(-Range.clip(gamepad2.right_stick_y,-1,1));
+        robo.leftTrackUp.setPower(-Range.clip(gamepad2.right_stick_y, -1,1));
 
         
         
-        if (gamepad2.a)
+        if (gamepad2.right_bumper)
         {
             robo.RPlate.setPosition(.08);
             robo.LPlate.setPosition(1);
         }
-        else if (gamepad2.x)
+        else
         {
             robo.RPlate.setPosition(.81);
             robo.LPlate.setPosition(.27);
         }
+
+
+        if (gamepad2.dpad_up)
+        {
+            robo.arm(HardwareTOBOR.armPos.Up);
+        }
+        else if (gamepad2.dpad_down)
+        {
+            robo.arm(HardwareTOBOR.armPos.Down);
+        }
+        else if (gamepad2.dpad_left||gamepad2.dpad_right)
+        {
+            robo.arm(HardwareTOBOR.armPos.Back);
+        }
         telemetry.addData("RPlate", robo.RPlate.getPosition());
         telemetry.addData("LPlate", robo.LPlate.getPosition());
+        telemetry.addData("JoystickL", gamepad2.left_stick_y);
+        telemetry.addData("JoystickR", gamepad2.right_stick_y);
     }
 
 
@@ -216,5 +155,8 @@ public class TOBORTank extends OpMode {
         robo.leftTrackUp.setPower(0);
         robo.rightTrackDown.setPower(0);
         robo.leftTrackDown.setPower(0);
+        robo.RPlate.setPosition(.81);
+        robo.LPlate.setPosition(.27);
+        robo.arm(HardwareTOBOR.armPos.Up);
     }
 }

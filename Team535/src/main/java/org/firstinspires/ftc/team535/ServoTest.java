@@ -67,8 +67,11 @@ public class ServoTest extends OpMode {
 
         robo.LPlate.setPosition(robo.LPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.left_stick_y)));
 
+        robo.JArm.setPosition(robo.JArm.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_trigger)));
+        robo.JArm.setPosition(robo.JArm.getPosition()-(0.002*Range.clip(1,1,gamepad1.left_trigger)));
         telemetry.addData("RPlate", robo.RPlate.getPosition());
         telemetry.addData("LPlate", robo.LPlate.getPosition());
+        telemetry.addData("Arm", robo.JArm.getPosition());
     }
 
 

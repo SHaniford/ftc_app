@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.util.Range;
 import java.lang.Math;
 
@@ -49,7 +50,10 @@ public class ToborRedSideAutonomous extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
     double heading;
+    HardwareTOBOR.direction dir;
     public enum state{
+        READJEWEL,
+        HITJEWEL,
         DRIVEOFFSTONE,
         SEEKCOLUMN,
         LEFT,
@@ -72,6 +76,7 @@ public class ToborRedSideAutonomous extends OpMode
         robo.initRobo(hardwareMap);
         robo.initVuforia();
         robo.startVuforia();
+
         
     }
 
@@ -108,6 +113,35 @@ public class ToborRedSideAutonomous extends OpMode
     {
         telemetry.addData("BRMotor", robo.BRMotor.getCurrentPosition());
         switch (currentState){
+            case READJEWEL:
+                robo.arm(HardwareTOBOR.armPos.Down);
+                dir = robo.knockJewel(HardwareTOBOR.color.Red);
+                telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Red));
+                if (dir != HardwareTOBOR.direction.Unknown)
+                {
+                    currentState = state.HITJEWEL;
+                }
+                break;
+            case HITJEWEL:
+                if (dir == HardwareTOBOR.direction.Left)
+                {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.BRMotor.setPower(-0.3);
+                }
+                else if (dir == HardwareTOBOR.direction.Right)
+                {
+                    robo.BRMotor.setPower(-0.3);
+                    robo.FRMotor.setPower(-0.3);
+                    robo.BLMotor.setPower(0.3);
+                    robo.BRMotor.setPower(0.3);
+                }
+                else
+                {
+                    currentState = state.READJEWEL;
+                }
+                break;
             case DRIVEOFFSTONE:
                 heading = robo.strafeRightAuto(0.35);
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
