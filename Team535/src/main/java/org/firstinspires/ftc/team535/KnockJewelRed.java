@@ -35,73 +35,45 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "Calibration", group = "Teleop")
+@TeleOp(name = "Knock Red Jewel", group = "Teleop")
 //@Disabled
 
-public class ServoTest extends OpMode {
+public class KnockJewelRed extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
-    double speedControl = 1;
-    boolean toggleR = false;
-    boolean runningR = false;
-    boolean toggleL = false;
-    boolean runningL = false;
+
 
 
     @Override
     public void init() {
 
         robo.initRobo(hardwareMap);
-        telemetry.addData("Status:", "Robot is Initialized");
+        robo.arm(HardwareTOBOR.armPos.Up);
 
     }
 
     @Override
     public void init_loop() { }
 
-
+    @Override
+    public void start(){
+        robo.runtime.reset();
+        robo.arm(HardwareTOBOR.armPos.Down);
+    }
     @Override
     public void loop() {
 
-        robo.RPlate.setPosition(robo.RPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_stick_y)));
 
-        robo.LPlate.setPosition(robo.LPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.left_stick_y)));
+        telemetry.addData("H", robo.hsvValues[0]);
+        telemetry.addData("S", robo.hsvValues[1]);
+        telemetry.addData("V", robo.hsvValues[2]);
+        telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Red));
 
-        robo.JArm.setPosition(robo.JArm.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_trigger)));
-        robo.JArm.setPosition(robo.JArm.getPosition()-(0.002*Range.clip(1,1,gamepad1.left_trigger)));
-        telemetry.addData("RPlate", robo.RPlate.getPosition());
-        telemetry.addData("LPlate", robo.LPlate.getPosition());
-        telemetry.addData("Arm", robo.JArm.getPosition());
-        if (gamepad1.left_bumper)
-        {
-            robo.rightTrackUp.setPower(0.5);
-            robo.leftTrackUp.setPower(0);
-            //18.06
-            //.903 s/rev
-            // adjust .83533
-        }
-        else if (gamepad1.right_bumper)
-        {
-            //1.081 s/rev
-            // adjust 1
-            robo.leftTrackUp.setPower(0.5);
-            robo.rightTrackUp.setPower(0);
-        }
-        else
-        {
-            robo.leftTrackUp.setPower(0);
-            robo.rightTrackUp.setPower(0);
-        }
     }
 
 
     @Override
     public void stop() {
-        robo.FRMotor.setPower(0);
-        robo.BRMotor.setPower(0);
-        robo.FLMotor.setPower(0);
-        robo.BLMotor.setPower(0);
-        robo.rightTrackUp.setPower(0);
-        robo.leftTrackUp.setPower(0);
+
     }
 }

@@ -129,28 +129,29 @@ blueSide = readImage;
                 }
                 break;
             case offStone:
-<<<<<<< HEAD
+
                     if (robo.readKey() == RelicRecoveryVuMark.LEFT) {
-=======
-                    if (vuMark == RelicRecoveryVuMark.LEFT) {
->>>>>>> origin/master
-                        blueSide = left;
-                    }
-                    if (vuMark == RelicRecoveryVuMark.CENTER) {
-                        blueSide = center;
-                    }
-                    if (vuMark == RelicRecoveryVuMark.RIGHT) {
-                        blueSide = right;
+
+                        if (vuMark == RelicRecoveryVuMark.LEFT) {
+
+                            blueSide = left;
+                        }
+                        if (vuMark == RelicRecoveryVuMark.CENTER) {
+                            blueSide = center;
+                        }
+                        if (vuMark == RelicRecoveryVuMark.RIGHT) {
+                            blueSide = right;
+                        }
                     }
 
                 break;
             case left:
                 heading = robo.strafeLeftAuto(0.35);
-<<<<<<< HEAD
+
                 if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
-=======
+
                 if ((25*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
->>>>>>> origin/master
+
                 {
                     blueSide = forward;
                 }
@@ -165,11 +166,11 @@ blueSide = forward;
                 break;
             case right:
                 heading = robo.strafeLeftAuto(0.35);
-<<<<<<< HEAD
+
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
-=======
+
                 if (((46*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
->>>>>>> origin/master
+
                 {
                     blueSide = forward;
                 }

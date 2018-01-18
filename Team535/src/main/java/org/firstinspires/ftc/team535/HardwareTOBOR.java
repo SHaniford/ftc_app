@@ -36,6 +36,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -54,6 +55,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import java.util.Timer;
+
 
 public class HardwareTOBOR
 {
@@ -69,6 +72,7 @@ public class HardwareTOBOR
     Servo LPlate;
     Servo JArm;
     ColorSensor armSensor;
+    CRServo relicArmTurn;
     
     ModernRoboticsI2cRangeSensor rangeSensor;
     
@@ -78,7 +82,7 @@ public class HardwareTOBOR
     VuforiaTrackables relicTrackables;
     VuforiaTrackable relicTemplate;
     private VuforiaTrackableDefaultListener relicTemplateListener;
-
+    public ElapsedTime runtime = new ElapsedTime();
     public enum Crypto {
         Left,
         Center,
@@ -132,6 +136,7 @@ public class HardwareTOBOR
         leftTrackDown = hwMap.dcMotor.get("LTrackDown");
         RPlate = hwMap.servo.get("RPlate");
         LPlate = hwMap.servo.get("LPlate");
+        relicArmTurn = hwMap.crservo.get("relicArmTurn");
         rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range sensor");
         JArm = hwMap.servo.get("Arm");
         armSensor = hwMap.colorSensor.get("armSensor");
@@ -206,7 +211,7 @@ public class HardwareTOBOR
     {
         if (armPos == HardwareTOBOR.armPos.Up)
         {
-            JArm.setPosition(.28889);
+            JArm.setPosition(.3067);
             armSensor.enableLed(false);
         }
         else if (armPos == HardwareTOBOR.armPos.Down)
@@ -224,10 +229,15 @@ public class HardwareTOBOR
     {
         if (targetColor == color.Red) {
             Color.RGBToHSV(armSensor.red() * 8, armSensor.green() * 8, armSensor.blue() * 8, hsvValues);
-            if (hsvValues[0] >= 237 || hsvValues[0] <= 18) {
+            if ((hsvValues[0] >= 335 || hsvValues[0] <= 25) && hsvValues[1] >= 0.5) {
                 return direction.Left;
-            } else if (hsvValues[0] >= 152 && hsvValues[0] <= 191) {
+            } else if (hsvValues[0] >= 205 && hsvValues[0] <= 270 && hsvValues[1] >= 0.5) {
                 return direction.Right;
+            }
+            else if (runtime.time() >= 2)
+            {
+                JArm.setPosition(JArm.getPosition()-0.002);
+                return direction.Unknown;
             }
             else
             {
@@ -238,7 +248,7 @@ public class HardwareTOBOR
         else if (targetColor == color.Blue)
         {
             Color.RGBToHSV(armSensor.red() * 8, armSensor.green() * 8, armSensor.blue() * 8, hsvValues);
-            if (hsvValues[0] >= 237 || hsvValues[0] <= 18) {
+            if ((hsvValues[0] >= 237 || hsvValues[0] <= 18)) {
                 return direction.Right;
             } else if (hsvValues[0] >= 152 && hsvValues[0] <= 191) {
                 return direction.Left;
@@ -253,6 +263,7 @@ public class HardwareTOBOR
         {
             return direction.Unknown;
         }
+
 
 
     }

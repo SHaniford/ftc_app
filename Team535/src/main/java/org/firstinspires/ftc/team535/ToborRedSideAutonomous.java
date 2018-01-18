@@ -30,6 +30,10 @@
 package org.firstinspires.ftc.team535;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -53,7 +57,8 @@ public class ToborRedSideAutonomous extends OpMode
     HardwareTOBOR.direction dir;
     public enum state{
         READJEWEL,
-        HITJEWEL,
+        HITJEWELOUT,
+        HITJEWELIN,
         DRIVEOFFSTONE,
         SEEKCOLUMN,
         LEFT,
@@ -62,7 +67,6 @@ public class ToborRedSideAutonomous extends OpMode
         PLACEBLOCK,
         BACKUP,
         STOPALL
-
     }
 
     double TPI = 43;
@@ -119,29 +123,61 @@ public class ToborRedSideAutonomous extends OpMode
                 telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Red));
                 if (dir != HardwareTOBOR.direction.Unknown)
                 {
-                    currentState = state.HITJEWEL;
+                    currentState = state.HITJEWELOUT;
                 }
                 break;
-            case HITJEWEL:
+            case HITJEWELOUT:
+                robo.angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 if (dir == HardwareTOBOR.direction.Left)
                 {
                     robo.BRMotor.setPower(0.3);
                     robo.FRMotor.setPower(0.3);
                     robo.BLMotor.setPower(-0.3);
-                    robo.BRMotor.setPower(-0.3);
+                    robo.FLMotor.setPower(-0.3);
+                    if (robo.angles.firstAngle >= 15)
+                    {
+                        currentState = state.HITJEWELIN;
+                    }
                 }
                 else if (dir == HardwareTOBOR.direction.Right)
                 {
                     robo.BRMotor.setPower(-0.3);
                     robo.FRMotor.setPower(-0.3);
                     robo.BLMotor.setPower(0.3);
-                    robo.BRMotor.setPower(0.3);
+                    robo.FLMotor.setPower(0.3);
+                    if (robo.angles.firstAngle <= -15)
+                    {
+                        currentState = state.HITJEWELIN;
+                    }
                 }
                 else
                 {
                     currentState = state.READJEWEL;
                 }
                 break;
+            case HITJEWELIN:
+                if (dir == HardwareTOBOR.direction.Left)
+                {
+                    robo.BRMotor.setPower(-0.3);
+                    robo.FRMotor.setPower(-0.3);
+                    robo.BLMotor.setPower(0.3);
+                    robo.FLMotor.setPower(0.3);
+                    if (robo.angles.firstAngle <=1 &&robo.angles.firstAngle >=-1)
+                    {
+                        currentState = state.DRIVEOFFSTONE;
+                    }
+                }
+                else if (dir == HardwareTOBOR.direction.Right)
+                {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.FLMotor.setPower(-0.3);
+                    if (robo.angles.firstAngle <=1 &&robo.angles.firstAngle >=-1)
+                    {
+                        currentState = state.DRIVEOFFSTONE;
+                    }
+                }
             case DRIVEOFFSTONE:
                 heading = robo.strafeRightAuto(0.35);
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
@@ -215,38 +251,6 @@ public class ToborRedSideAutonomous extends OpMode
         }
         telemetry.addData("State", currentState);
         telemetry.addData("1", "heading: " + heading);
-        
-
-
-
-        /*if (currentState == state.DRIVEOFFSTONE)
-        {
-            robo.BRMotor.setTargetPosition(-24*TPI);
-            robo.BLMotor.setTargetPosition(24*TPI);
-            robo.FRMotor.setTargetPosition(24*TPI);
-            robo.FLMotor.setTargetPosition(-24*TPI);
-            robo.strafeLeft(1);
-        }
-        else if (currentState == state.SEEKCOLUMN)
-        {
-            if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Left)
-            {
-
-            }
-            else if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Right)
-            {
-
-            }
-            else if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Center)
-            {
-
-            }
-            else
-            {
-
-            }
-        }*/
-
     }
 
     @Override

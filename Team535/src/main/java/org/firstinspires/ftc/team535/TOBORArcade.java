@@ -31,17 +31,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.team535;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "TOBOR Tank Drive", group = "Teleop")
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.lang.Math.*;
+
+@TeleOp(name = "TOBOR Arcade", group = "Teleop")
 //@Disabled
 
-public class TOBORTank extends OpMode {
+public class TOBORArcade extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
     double speedControl;
@@ -54,9 +58,10 @@ public class TOBORTank extends OpMode {
     boolean runningRT = false;
     boolean toggleLT = false;
     boolean runningLT = false;
-//poop
+
     boolean toggleRunmode = false;
     boolean fastRunmode = true;
+    Orientation angles;
     @Override
     public void init() {
 
@@ -72,7 +77,7 @@ public class TOBORTank extends OpMode {
     @Override
     public void loop() {
 
-        if (gamepad1.right_trigger >= 0.1) {
+        /*if (gamepad1.right_trigger >= 0.1) {
             robo.strafeRight(gamepad1.right_trigger*speedControl);
         } else if (gamepad1.left_trigger >= 0.1) {
             robo.strafeLeft(gamepad1.left_trigger*speedControl);
@@ -82,7 +87,38 @@ public class TOBORTank extends OpMode {
             robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
             robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
         }
+*/
+        double lefty = Range.clip(gamepad1.left_stick_y,-1,1);
+        double leftx = Range.clip(gamepad1.left_stick_x,-1,1);
+        double righty = Range.clip(gamepad1.right_stick_y,-1,1);
+        double rightx = Range.clip(gamepad1.right_stick_x,-1,1);
+        angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double angle = -Math.atan2(rightx, righty);
+        double hypotenuse = (Math.sqrt((rightx*rightx) + (righty * righty)))*speedControl;
+        if (angle < 0)
+        {
+            angle = 2 * Math.PI + angle;
+        }
+        if (angles.firstAngle <0)
+        {
+            angle = angle-(360 + angles.firstAngle);
+        }
+        else
+        {
+            angle = angle-(angles.firstAngle);
+        }
 
+
+
+
+        telemetry.addData("angle", angle);
+
+        robo.BLMotor.setPower(-((hypotenuse*Math.cos(angle+(Math.PI/4)))-leftx));
+        robo.FRMotor.setPower(-((hypotenuse*Math.cos(angle+(Math.PI/4)))+leftx));
+        robo.BRMotor.setPower(-((hypotenuse*Math.sin(angle+(Math.PI/4)))+leftx));
+        robo.FLMotor.setPower(-((hypotenuse*Math.sin(angle+(Math.PI/4)))-leftx));
+
+        telemetry.addData("angle", angles);
 
         if (toggleRunmode)
         {

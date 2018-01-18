@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Qualcomm Technologies Inc
+/* Copyright (c) 2014, 2015 Qualcomm Technologies Inc
 
 All rights reserved.
 
@@ -31,77 +31,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.team535;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "Calibration", group = "Teleop")
+/**
+ * Demonstrates empty OpMode
+ */
+@TeleOp(name = "Test", group = "Teleop")
 //@Disabled
+public class TestThings extends OpMode {
 
-public class ServoTest extends OpMode {
-
-    HardwareTOBOR robo = new HardwareTOBOR();
-    double speedControl = 1;
-    boolean toggleR = false;
-    boolean runningR = false;
-    boolean toggleL = false;
-    boolean runningL = false;
-
+    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void init() {
-
-        robo.initRobo(hardwareMap);
-        telemetry.addData("Status:", "Robot is Initialized");
-
+        telemetry.addData("Status", "Initialized");
     }
+
 
     @Override
     public void init_loop() { }
 
 
     @Override
-    public void loop() {
-
-        robo.RPlate.setPosition(robo.RPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_stick_y)));
-
-        robo.LPlate.setPosition(robo.LPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.left_stick_y)));
-
-        robo.JArm.setPosition(robo.JArm.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_trigger)));
-        robo.JArm.setPosition(robo.JArm.getPosition()-(0.002*Range.clip(1,1,gamepad1.left_trigger)));
-        telemetry.addData("RPlate", robo.RPlate.getPosition());
-        telemetry.addData("LPlate", robo.LPlate.getPosition());
-        telemetry.addData("Arm", robo.JArm.getPosition());
-        if (gamepad1.left_bumper)
-        {
-            robo.rightTrackUp.setPower(0.5);
-            robo.leftTrackUp.setPower(0);
-            //18.06
-            //.903 s/rev
-            // adjust .83533
-        }
-        else if (gamepad1.right_bumper)
-        {
-            //1.081 s/rev
-            // adjust 1
-            robo.leftTrackUp.setPower(0.5);
-            robo.rightTrackUp.setPower(0);
-        }
-        else
-        {
-            robo.leftTrackUp.setPower(0);
-            robo.rightTrackUp.setPower(0);
-        }
+    public void start() {
+        runtime.reset();
     }
 
 
     @Override
-    public void stop() {
-        robo.FRMotor.setPower(0);
-        robo.BRMotor.setPower(0);
-        robo.FLMotor.setPower(0);
-        robo.BLMotor.setPower(0);
-        robo.rightTrackUp.setPower(0);
-        robo.leftTrackUp.setPower(0);
+    public void loop() {
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        double lefty = Range.clip(gamepad1.left_stick_y,-1,1);
+        double leftx = Range.clip(gamepad1.left_stick_x,-1,1);
+        double righty = Range.clip(gamepad1.right_stick_y,-1,1);
+        double rightx = Range.clip(gamepad1.right_stick_x,-1,1);
+
+        double angle = -Math.atan2(righty, rightx);
+        double hypotenuse = Math.sqrt((rightx*rightx) + (righty * righty));
+        if (angle < 0)
+        {
+            angle = 2 * Math.PI + angle;
+        }
+
+        telemetry.addData("angle", angle);
     }
+
+
+    @Override
+    public void stop() { }
 }
