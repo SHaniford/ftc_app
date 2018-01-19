@@ -164,7 +164,7 @@ blueSide = forward;
                 }
                 break;
             case forward:
-                robo.DriveForwardAuto(-0.2);
+                robo.DriveForwardAuto(-0.2,0);
                 if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 9.75)
                 {
                     blueSide=dispense;
@@ -183,7 +183,7 @@ blueSide = forward;
                 }
                 break;
             case jolt:
-                robo.DriveForwardAuto(0.2);
+                robo.DriveForwardAuto(0.2,0);
                 if (robo.rangeSensor.getDistance(DistanceUnit.INCH)>= 10)
                 {
                     blueSide=end;
