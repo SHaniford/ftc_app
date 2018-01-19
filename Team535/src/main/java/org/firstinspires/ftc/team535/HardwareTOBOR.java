@@ -309,10 +309,10 @@ public class HardwareTOBOR
         return angles.firstAngle;
 
     }
-        public double DriveForwardAuto(double power)
+        public double DriveForwardAuto(double power, int offset)
     {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double adjustment = angles.firstAngle/40;
+        double adjustment = (angles.firstAngle-offset)/40;
         BLMotor.setPower(power - adjustment);
         BRMotor.setPower(power + adjustment);
         FRMotor.setPower(power + adjustment);

@@ -97,15 +97,15 @@ public class TOBORArcade extends OpMode {
         double hypotenuse = (Math.sqrt((rightx*rightx) + (righty * righty)))*speedControl;
         if (angle < 0)
         {
-            angle = 2 * Math.PI + angle;
+            angle = (2 * Math.PI) + angle;
         }
         if (angles.firstAngle <0)
         {
-            angle = angle-(360 + angles.firstAngle);
+            angle = angle-(((360 + angles.firstAngle)/180)*Math.PI);
         }
         else
         {
-            angle = angle-(angles.firstAngle);
+            angle = angle-((angles.firstAngle/180)*Math.PI);
         }
 
 
