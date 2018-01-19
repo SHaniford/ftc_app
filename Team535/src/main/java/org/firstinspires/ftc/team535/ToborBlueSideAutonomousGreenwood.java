@@ -140,7 +140,7 @@ public class ToborBlueSideAutonomousGreenwood extends OpMode
                 }
                 break;
             case MOVEFORWARD:
-                robo.DriveForwardAuto(-0.2);
+                robo.DriveForwardAuto(-0.2,0);
                 if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
                 {
                     currentState = state.PLACEBLOCK;
