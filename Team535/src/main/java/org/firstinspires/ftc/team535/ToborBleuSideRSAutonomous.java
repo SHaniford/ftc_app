@@ -62,35 +62,112 @@ public class ToborBleuSideRSAutonomous extends OpMode
     
 
     HardwareTOBOR robo = new HardwareTOBOR();
-public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spitout, end }
-
+public enum Auto{readImage, readJewel, knockJewel, replace,faceColumn, offStone, right, left, center, jolt, endAll}
+Auto blueSide;
+    HardwareTOBOR.direction dir;
+    double heading;
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
-    robo.initRobo(hardwareMap);
+        robo.initRobo(hardwareMap);
         robo.initVuforia();
+        robo.startVuforia();
+        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        blueSide = Auto.readImage;
 
     }
 
 
     @Override
     public void init_loop() {
+        if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN)
+        {
+            vuMark = robo.readKey();
+            telemetry.addData("Vumark Acquired", vuMark);
+        }
 
     }
-
-
-
     @Override
-    public void start(){
+    public void start()
+    {
+        robo.stopVuforia();
+        robo.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
+
 
     @Override
     public void loop() {
+        telemetry.addData("Current Pos", robo.BRMotor.getCurrentPosition());
+        telemetry.addData("Current State", blueSide);
+        switch (blueSide) {
+            case readImage:
+                if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                    blueSide = Auto.readJewel;
+                }
+                break;
+            case readJewel:
+                robo.arm(HardwareTOBOR.armPos.Down);
+                dir = robo.knockJewel(HardwareTOBOR.color.Blue);
+                telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Blue));
+                if (dir != HardwareTOBOR.direction.Unknown) {
+                    blueSide = Auto.knockJewel;
+                }
+                break;
+            case knockJewel:
+                robo.angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                if (dir == HardwareTOBOR.direction.Left) {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.FLMotor.setPower(-0.3);
+                    if (robo.angles.firstAngle >= 15) {
+                        blueSide = Auto.replace;
+                    } else if (dir == HardwareTOBOR.direction.Right) {
+                        robo.BRMotor.setPower(-0.3);
+                        robo.FRMotor.setPower(-0.3);
+                        robo.BLMotor.setPower(0.3);
+                        robo.FLMotor.setPower(0.3);
+                        if (robo.angles.firstAngle <= -15) {
+                            blueSide = Auto.replace;
+                        }
+                    } else {
+                        blueSide = Auto.readJewel;
+                    }
+                }
+            case replace:
+                if (dir == HardwareTOBOR.direction.Left) {
+                    robo.BRMotor.setPower(-0.3);
+                    robo.FRMotor.setPower(-0.3);
+                    robo.BLMotor.setPower(0.3);
+                    robo.FLMotor.setPower(0.3);
+                    if (robo.angles.firstAngle <= 1 && robo.angles.firstAngle >= -1) {
+                        blueSide = Auto.offStone;
+                    }
+                } else if (dir == HardwareTOBOR.direction.Right) {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.FLMotor.setPower(-0.3);
+                    if (robo.angles.firstAngle <= 1 && robo.angles.firstAngle >= -1) {
+                        blueSide = Auto.offStone;
+                    }
+                }
+                
+
+
+        }
     }
 
-    @Override
-    public void stop() {
+        @Override
+        public void stop () {
+        }
     }
 
-}

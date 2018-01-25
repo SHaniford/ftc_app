@@ -50,9 +50,12 @@ import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.dispe
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.end;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.forward;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.jolt;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.knockJewel;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.left;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.offStone;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readImage;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.readJewel;
+import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.replace;
 import static org.firstinspires.ftc.team535.ToborBleuSideLSAutonomous.Auto.right;
 import java.lang.Math;
 
@@ -62,9 +65,10 @@ import java.lang.Math;
 public class ToborBleuSideLSAutonomous extends OpMode
 {
     double TPI = 43;
-public enum Auto{readImage, offStone, left, center, right, forward, dispense, jolt, end }
+public enum Auto{readImage, readJewel, knockJewel, replace, offStone, left, center, right, forward, dispense, jolt, end }
     Auto blueSide;
     HardwareTOBOR robo = new HardwareTOBOR();
+    HardwareTOBOR.direction dir;
     double heading;
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
     @Override
@@ -113,9 +117,69 @@ blueSide = readImage;
         switch (blueSide) {
             case readImage:
                 if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-                   blueSide = offStone;
+                   blueSide = readJewel;
                 }
                 break;
+            case readJewel:
+                robo.arm(HardwareTOBOR.armPos.Down);
+                dir = robo.knockJewel(HardwareTOBOR.color.Blue);
+                telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Blue));
+                if (dir != HardwareTOBOR.direction.Unknown)
+                {
+                    blueSide = knockJewel;
+                }
+                break;
+            case knockJewel:
+                robo.angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                if (dir == HardwareTOBOR.direction.Left)
+                {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.FLMotor.setPower(-0.3);
+                    if (robo.angles.firstAngle >= 15)
+                    {
+                        blueSide = replace;
+                    }
+                    else if (dir == HardwareTOBOR.direction.Right)
+                    {
+                        robo.BRMotor.setPower(-0.3);
+                        robo.FRMotor.setPower(-0.3);
+                        robo.BLMotor.setPower(0.3);
+                        robo.FLMotor.setPower(0.3);
+                        if (robo.angles.firstAngle <= -15)
+                        {
+                            blueSide=replace;
+                        }
+                    }
+                    else{
+                        blueSide = readJewel;
+                    }
+                }
+            case replace:
+                if (dir == HardwareTOBOR.direction.Left)
+                {
+                    robo.BRMotor.setPower(-0.3);
+                    robo.FRMotor.setPower(-0.3);
+                    robo.BLMotor.setPower(0.3);
+                    robo.FLMotor.setPower(0.3);
+                    if (robo.angles.firstAngle <=1 &&robo.angles.firstAngle >=-1)
+                    {
+                       blueSide= offStone;
+                    }
+                }
+                else if (dir == HardwareTOBOR.direction.Right)
+                {
+                    robo.BRMotor.setPower(0.3);
+                    robo.FRMotor.setPower(0.3);
+                    robo.BLMotor.setPower(-0.3);
+                    robo.FLMotor.setPower(-0.3);
+                    if (robo.angles.firstAngle <=1 &&robo.angles.firstAngle >=-1)
+                    {
+                        blueSide=offStone;
+                    }
+                }
+
             case offStone:
 
                     if (robo.readKey() == RelicRecoveryVuMark.LEFT) {
