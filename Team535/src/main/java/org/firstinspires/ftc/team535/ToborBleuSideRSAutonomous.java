@@ -38,7 +38,18 @@ import com.vuforia.VuMarkTarget;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.DFWD;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.center;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.dispense;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.endAll;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.forward;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.jolt;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.left;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.offStone;
+import static org.firstinspires.ftc.team535.ToborBleuSideRSAutonomous.Auto.right;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -62,10 +73,11 @@ public class ToborBleuSideRSAutonomous extends OpMode
     
 
     HardwareTOBOR robo = new HardwareTOBOR();
-public enum Auto{readImage, readJewel, knockJewel, replace,faceColumn, offStone, right, left, center, jolt, endAll}
+public enum Auto{readImage, readJewel, knockJewel, replace, offStone, DFWD, right, left, center, forward, dispense, jolt, endAll}
 Auto blueSide;
     HardwareTOBOR.direction dir;
     double heading;
+    double TPI = 43;
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
     @Override
     public void init() {
@@ -142,13 +154,14 @@ Auto blueSide;
                         blueSide = Auto.readJewel;
                     }
                 }
+                break;
             case replace:
                 if (dir == HardwareTOBOR.direction.Left) {
                     robo.BRMotor.setPower(-0.3);
                     robo.FRMotor.setPower(-0.3);
                     robo.BLMotor.setPower(0.3);
                     robo.FLMotor.setPower(0.3);
-                    if (robo.angles.firstAngle <= 1 && robo.angles.firstAngle >= -1) {
+                    if (robo.angles.firstAngle <= 91 && robo.angles.firstAngle >= 89) {
                         blueSide = Auto.offStone;
                     }
                 } else if (dir == HardwareTOBOR.direction.Right) {
@@ -156,12 +169,85 @@ Auto blueSide;
                     robo.FRMotor.setPower(0.3);
                     robo.BLMotor.setPower(-0.3);
                     robo.FLMotor.setPower(-0.3);
-                    if (robo.angles.firstAngle <= 1 && robo.angles.firstAngle >= -1) {
-                        blueSide = Auto.offStone;
+                    if (robo.angles.firstAngle <= 91 && robo.angles.firstAngle >= 89 ) {
+                        blueSide = Auto.DFWD;
                     }
                 }
-                
+                break;
+            case DFWD:
+                robo.DriveForwardAuto(-0.2,0);
+if(((19*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)) && (robo.rangeSensor.getDistance(DistanceUnit.INCH) <=10.5) && (robo.rangeSensor.getDistance(DistanceUnit.INCH) >=10))  {
+    blueSide = offStone;
+            }
 
+                break;
+            case offStone:
+                heading = robo.strafeLeftAuto(0.35);
+                if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    if (vuMark == RelicRecoveryVuMark.LEFT) {
+                        blueSide = left;
+                    }
+                    if (vuMark == RelicRecoveryVuMark.CENTER) {
+                        blueSide = center;
+                    }
+                    if (vuMark == RelicRecoveryVuMark.RIGHT) {
+                        blueSide = forward;
+                    }
+                }
+
+            case left:
+                heading = robo.strafeLeftAuto(0.35);
+                if ((46*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    blueSide = forward;
+                }
+                break;
+            case center:
+                heading = robo.strafeLeftAuto(0.35);
+                telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
+                if (((36*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+                {
+                    blueSide = forward;
+                }
+                break;
+            case forward:
+heading = robo.DriveForwardAuto(-.35,0);
+                if (((2*TPI)-robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 8))
+                {
+                    blueSide = dispense;
+                }
+
+                break;
+            case dispense:
+                robo.RPlate.setPosition(.08);
+                robo.LPlate.setPosition(1);
+                robo.BRMotor.setPower(0);
+                robo.FRMotor.setPower(0);
+                robo.BLMotor.setPower(0);
+                robo.FLMotor.setPower(0);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 8)
+                {
+                    blueSide=jolt;
+                }
+
+                break;
+            case jolt:
+                robo.DriveForwardAuto(0.2,0);
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH) <= 4)
+                {
+                    blueSide = endAll;
+                }
+                break;
+            case endAll:
+                robo.RPlate.setPosition(.81);
+                robo.LPlate.setPosition(.27);
+                robo.BRMotor.setPower(0);
+                robo.FRMotor.setPower(0);
+                robo.BLMotor.setPower(0);
+                robo.FLMotor.setPower(0);
+
+                break;
 
         }
     }
