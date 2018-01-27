@@ -71,8 +71,11 @@ public class HardwareTOBOR
     Servo RPlate;
     Servo LPlate;
     Servo JArm;
-    ColorSensor armSensor;
+    Servo Claw;
     CRServo relicArmTurn;
+    CRServo relicArmExtend;
+    ColorSensor armSensor;
+
     
     ModernRoboticsI2cRangeSensor rangeSensor;
     
@@ -83,6 +86,7 @@ public class HardwareTOBOR
     VuforiaTrackable relicTemplate;
     private VuforiaTrackableDefaultListener relicTemplateListener;
     public ElapsedTime runtime = new ElapsedTime();
+    double JArmUpVal = .3067;
     public enum Crypto {
         Left,
         Center,
@@ -137,9 +141,11 @@ public class HardwareTOBOR
         RPlate = hwMap.servo.get("RPlate");
         LPlate = hwMap.servo.get("LPlate");
         relicArmTurn = hwMap.crservo.get("relicArmTurn");
+        relicArmExtend = hwMap.crservo.get("relicArmExtend");
         rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range sensor");
         JArm = hwMap.servo.get("Arm");
         armSensor = hwMap.colorSensor.get("armSensor");
+        Claw = hwMap.servo.get("claw");
 
 
         FRMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -211,17 +217,17 @@ public class HardwareTOBOR
     {
         if (armPos == HardwareTOBOR.armPos.Up)
         {
-            JArm.setPosition(.3067);
+            JArm.setPosition(.1927);
             armSensor.enableLed(false);
         }
         else if (armPos == HardwareTOBOR.armPos.Down)
         {
-            JArm.setPosition(.9583);
+            JArm.setPosition(.8744);
             armSensor.enableLed(true);
         }
         else if (armPos == HardwareTOBOR.armPos.Back)
         {
-            JArm.setPosition(.1);
+            JArm.setPosition(0);
             armSensor.enableLed(false);
         }
     }

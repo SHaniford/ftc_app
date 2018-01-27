@@ -172,6 +172,9 @@ public class ToborRedSideAutonomousBad extends OpMode
                     }
                 }
             case DRIVEFORWARD:
+                robo.DriveForwardAuto(0.5,90;
+                if (robo.rangeSensor.getDistance(DistanceUnit.INCH) <= )
+
 
             case DRIVEOFFSTONEEQUIVALENT:
                 heading = robo.strafeRightAuto(0.35);
