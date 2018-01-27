@@ -59,6 +59,7 @@ public class ToborRedSideAutonomous extends OpMode
         READJEWEL,
         HITJEWELOUT,
         HITJEWELIN,
+        ARMUP,
         DRIVEOFFSTONE,
         SEEKCOLUMN,
         LEFT,
@@ -72,7 +73,7 @@ public class ToborRedSideAutonomous extends OpMode
     double TPI = 43;
     state currentState = state.DRIVEOFFSTONE;
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
-    
+
     @Override
     public void init()
     {
@@ -104,6 +105,7 @@ public class ToborRedSideAutonomous extends OpMode
     @Override
     public void start()
     {
+        robo.runtime.reset();
         robo.stopVuforia();
         robo.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robo.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -124,6 +126,11 @@ public class ToborRedSideAutonomous extends OpMode
                 if (dir != HardwareTOBOR.direction.Unknown)
                 {
                     currentState = state.HITJEWELOUT;
+                }
+                else if (robo.runtime.seconds() >= 4)
+                {
+
+                    currentState = state.DRIVEOFFSTONE;
                 }
                 break;
             case HITJEWELOUT:
@@ -156,7 +163,7 @@ public class ToborRedSideAutonomous extends OpMode
                 }
                 break;
             case HITJEWELIN:
-                if (dir == HardwareTOBOR.direction.Left)
+                if (robo.angles.firstAngle < -1)
                 {
                     robo.BRMotor.setPower(-0.3);
                     robo.FRMotor.setPower(-0.3);
@@ -167,18 +174,25 @@ public class ToborRedSideAutonomous extends OpMode
                         currentState = state.DRIVEOFFSTONE;
                     }
                 }
-                else if (dir == HardwareTOBOR.direction.Right)
-                {
+                else if (robo.angles.firstAngle >1) {
                     robo.BRMotor.setPower(0.3);
                     robo.FRMotor.setPower(0.3);
                     robo.BLMotor.setPower(-0.3);
                     robo.FLMotor.setPower(-0.3);
-                    if (robo.angles.firstAngle <=1 &&robo.angles.firstAngle >=-1)
-                    {
+                    if (robo.angles.firstAngle <= 1 && robo.angles.firstAngle >= -1) {
                         currentState = state.DRIVEOFFSTONE;
                     }
                 }
+                break;
+            case ARMUP:
+                robo.arm(HardwareTOBOR.armPos.Up);
+                if (Math.abs(robo.JArm.getPosition()-robo.JArmUpVal) <= 0.05)
+                {
+                    currentState = state.DRIVEOFFSTONE;
+                }
+                break;
             case DRIVEOFFSTONE:
+
                 heading = robo.strafeRightAuto(0.35);
                 if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 7.75))
                 {
@@ -217,11 +231,14 @@ public class ToborRedSideAutonomous extends OpMode
                 break;
             case MOVEFORWARD:
                 robo.DriveForwardAuto(-0.2,0);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 7.25)
+                if (robo.runtime.seconds() >= 0.5 && robo.runtime.seconds()<= 1)
                 {
-                    currentState = state.STOPALL;
+                    currentState = state.BACKUP;
                 }
-                
+                if (robo.runtime.seconds() >= 1.5)
+                {
+                    currentState = state.BACKUP;
+                }
                 break;
             case PLACEBLOCK:
                 robo.RPlate.setPosition(.08);
@@ -230,11 +247,17 @@ public class ToborRedSideAutonomous extends OpMode
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);
                 robo.FLMotor.setPower(0);
+                robo.runtime.reset();
                 currentState = state.MOVEFORWARD;
                 break;
             case BACKUP:
                 robo.DriveForwardAuto(0.2,0);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH) <= 1.75)
+                if (robo.runtime.seconds() >= 1 && robo.runtime.seconds() <=1.5)
+                {
+
+                      currentState = state.MOVEFORWARD;
+                }
+                if (robo.runtime.seconds() >=2)
                 {
                     currentState = state.STOPALL;
                 }

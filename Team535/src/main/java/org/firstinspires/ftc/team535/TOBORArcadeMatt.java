@@ -42,10 +42,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.lang.Math.*;
 
-@TeleOp(name = "TOBOR Arcade", group = "Teleop")
+@TeleOp(name = "TOBOR Arcade Matt", group = "Teleop")
 //@Disabled
 
-public class TOBORArcade extends OpMode {
+public class TOBORArcadeMatt extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
     double speedControl;
@@ -76,49 +76,49 @@ public class TOBORArcade extends OpMode {
 
     @Override
     public void loop() {
+        telemetry.addData("Movement", "G1: Right Stick(Arcade)");
+        telemetry.addData("Runmode", "G1: Right Stick Button (Fast/Slow)");
+        telemetry.addData("Lower Track", "G2: Left Stick Y");
+        telemetry.addData("Upper Track", "G2: Right Stick Y");
+        telemetry.addData("Flippy Dipper", "G2: Hold Right Bumper");
+        telemetry.addData("Jewel Arm Down", "G2: Dpad Down");
+        telemetry.addData("Jewel Arm Up", "G2: Dpad Up");
+        telemetry.addData("Jewel Arm Back", "G2: Dpad Right or Left");
 
-        /*if (gamepad1.right_trigger >= 0.1) {
-            robo.strafeRight(gamepad1.right_trigger*speedControl);
-        } else if (gamepad1.left_trigger >= 0.1) {
-            robo.strafeLeft(gamepad1.left_trigger*speedControl);
-        } else {
-            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
-            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
-            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
-            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
-        }
-*/
-        double lefty = Range.clip(gamepad1.left_stick_y,-1,1);
-        double leftx = Range.clip(gamepad1.left_stick_x,-1,1);
-        double righty = Range.clip(gamepad1.right_stick_y,-1,1);
-        double rightx = Range.clip(gamepad1.right_stick_x,-1,1);
+        double leftx = Range.clip(-gamepad1.left_stick_y,-1,1);
+        double rightx = -Range.clip(gamepad1.right_stick_y,-1,1);
+        double righty = Range.clip(gamepad1.right_stick_x,-1,1);
         angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double angle = -Math.atan2(rightx, righty);
+        double angle = (Math.atan2(righty, rightx));
+        telemetry.addData("ATAN2", Math.atan2(righty, rightx));
+        double otherAngle = 0;
         double hypotenuse = (Math.sqrt((rightx*rightx) + (righty * righty)))*speedControl;
         if (angle < 0)
         {
-            angle = (2 * Math.PI) + angle;
+            angle = ((2 * Math.PI) + angle);
         }
-        if (angles.firstAngle <0)
+
+
+        if (-angles.firstAngle <0)
         {
-            angle = angle-(((360 + angles.firstAngle)/180)*Math.PI);
+            otherAngle = ((360 + -angles.firstAngle)/180)*Math.PI;
+            angle = angle-(otherAngle);
         }
         else
         {
-            angle = angle-((angles.firstAngle/180)*Math.PI);
+            otherAngle = (-angles.firstAngle/180)*Math.PI;
+            angle = angle-(otherAngle);
         }
 
 
-
-
         telemetry.addData("angle", angle);
+        telemetry.addData("other angle", otherAngle);
 
-        robo.BLMotor.setPower(-((hypotenuse*Math.cos(angle+(Math.PI/4)))-leftx));
-        robo.FRMotor.setPower(-((hypotenuse*Math.cos(angle+(Math.PI/4)))+leftx));
-        robo.BRMotor.setPower(-((hypotenuse*Math.sin(angle+(Math.PI/4)))+leftx));
-        robo.FLMotor.setPower(-((hypotenuse*Math.sin(angle+(Math.PI/4)))-leftx));
+        robo.BLMotor.setPower((hypotenuse*Math.cos(angle+(Math.PI/4)))-(leftx*speedControl));
+        robo.FRMotor.setPower((hypotenuse*Math.cos(angle+(Math.PI/4)))+(leftx*speedControl));
+        robo.BRMotor.setPower((hypotenuse*Math.sin(angle+(Math.PI/4)))+(leftx*speedControl));
+        robo.FLMotor.setPower((hypotenuse*Math.sin(angle+(Math.PI/4)))-(leftx*speedControl));
 
-        telemetry.addData("angle", angles);
 
         if (toggleRunmode)
         {
@@ -174,11 +174,12 @@ public class TOBORArcade extends OpMode {
         {
             robo.arm(HardwareTOBOR.armPos.Back);
         }
-        if (gamepad2.right_trigger >= 0.1)
+
+        if (gamepad1.right_bumper)
         {
             robo.relicArmTurn.setPower(1);
         }
-        else if (gamepad2.left_trigger >=0.1)
+        else if (gamepad1.left_bumper)
         {
             robo.relicArmTurn.setPower(-1);
         }
@@ -186,10 +187,6 @@ public class TOBORArcade extends OpMode {
         {
             robo.relicArmTurn.setPower(0);
         }
-        telemetry.addData("RPlate", robo.RPlate.getPosition());
-        telemetry.addData("LPlate", robo.LPlate.getPosition());
-        telemetry.addData("JoystickL", gamepad2.left_stick_y);
-        telemetry.addData("JoystickR", gamepad2.right_stick_y);
     }
 
 
